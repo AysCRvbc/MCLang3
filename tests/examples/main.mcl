@@ -1,0 +1,16 @@
+@name cctest # указание имени
+@import is_even # импорты теперь вот такие вот
+
+var y_d # Теперь если кол-во параметров 2, то используется тип скора dummy
+
+chat system = ["# CCTEST #"]
+selector players = @a # Новый тип данных
+
+input value(num) -> players #Блоки кода всё ещё тупо табуляцией
+    y_d = num
+    while y_d >= 0
+        res = is_even.check(y_d) # Импорты теперь вот так работают!!!
+        y_d -= 1
+
+    system.log(@s, ["Цикл Закончен"])
+    system.log(@s, [""])
