@@ -19,6 +19,10 @@ namespace.setFunction("checker")
 new_ns = namespace.copy("check")
 
 new_ns.setLocal("y_d")
+new_ns.setFunction("lmao.getlife")
 
+print(namespace.variables)
 print(namespace.functions)
+
+print(new_ns.variables)
 print(new_ns.functions)

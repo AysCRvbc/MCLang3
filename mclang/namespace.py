@@ -27,18 +27,19 @@ class Namespace:
         return self.variables[name]
 
     def setValue(self, name):
-        self.variables[name] = f"{self.prefix}{name}"
+        self.variables[name] = f"{self.prefix}_{name}"
         return self.variables[name]
 
     def setLocal(self, name):
-        self.variables[name] = f"{self.prefix}{name}"
+        self.variables[name] = f"{self.prefix}_{name}"
         return self.variables[name]
 
     def setFunction(self, name, sub_process=""):
-        prefix = f"{self.global_name}_"
+        prefix = f"{self.global_name}"
         if sub_process:
-            prefix += f"{sub_process}_"
-        self.functions[name] = f"{prefix}{name}"
+            prefix += f"_{sub_process}"
+        name = name.replace(".", "_")
+        self.functions[name] = f"{prefix}_{name}"
 
     def getFunction(self, name):
         if name not in self.functions:
