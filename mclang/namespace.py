@@ -38,8 +38,7 @@ class Namespace:
         prefix = f"{self.global_name}"
         if sub_process:
             prefix += f"_{sub_process}"
-        name = name.replace(".", "_")
-        self.functions[name] = f"{prefix}_{name}"
+        self.functions[name] = f'{prefix}_{name.replace(".", "_")}'
 
     def getFunction(self, name):
         if name not in self.functions:
