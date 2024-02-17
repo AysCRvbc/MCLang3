@@ -1,9 +1,24 @@
-import mclang.parser as parser
+# import mclang.parser as parser
+#
+# filename = "examples/main.mcl"
+#
+# with open(filename, 'r', encoding='utf-8') as f:
+#     code = f.read()
+#
+# for i in parser.parse(code):
+#     print(repr(i))
 
-filename = "examples/main.mcl"
 
-with open(filename, 'r', encoding='utf-8') as f:
-    code = f.read()
+import mclang.namespace as ns
 
-for i in parser.parse(code):
-    print(repr(i))
+namespace = ns.Namespace("cctest")
+
+namespace.setValue("y_d")
+namespace.setFunction("checker")
+
+new_ns = namespace.copy("check")
+
+new_ns.setLocal("y_d")
+
+print(namespace.functions)
+print(new_ns.functions)
