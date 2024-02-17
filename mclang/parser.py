@@ -40,23 +40,20 @@ def block_separator(mcc_code):
     for line in mcc_code.split("\n"):
         if line.strip():
             if line.startswith(current_tabs):
-                blocks[-1].append(line)
+                if len(blocks[-1]):
+                    blocks[-1].append("")
+                blocks[-1][1] += f"{line[4:]}\n"
             else:
                 blocks.append([line])
                 current_tabs = "" if line.startswith("    ") else "    "
     return blocks[1:]
 
 
-def parse(code: str, parent=""):
+def get_prc_node(code):
     code = preprocess(code)
+    return parse(code)
+
+def parse(code: str, parent=""):
     code = block_separator(code)
-
-    for block in code:
-        is_line = True
-        base = block[0].split()[0]
-        if base in block_types:
-            is_line = False
-
-        print(f"{is_line} => {block}")
 
     return code
