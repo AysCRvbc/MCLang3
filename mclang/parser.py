@@ -1,5 +1,22 @@
+block_types = {
+    "func": 1,
+    "input": 1,
+    "observer": 1,
+    "while": 1,
+    "if": 1,
+    "else": 1
+}
+
+line_types = {
+    "@name": 1,
+    "@import": 1,
+    "var": 1,
+    "chat": 1,
+    "selector": 1
+}
+
+
 def preprocess(code: str):
-    # Удаление комментариев, чистка пустых строк
     def delete_comment(line: str):
         res = ""
         is_str = False
@@ -34,6 +51,12 @@ def parse(code: str, parent=""):
     code = preprocess(code)
     code = block_separator(code)
 
-    
+    for block in code:
+        is_line = True
+        base = block[0].split()[0]
+        if base in block_types:
+            is_line = False
+
+        print(f"{is_line} => {block}")
 
     return code
