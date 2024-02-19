@@ -1,19 +1,33 @@
+from mclang.syntax.field import *
+from typing import Type
+from mclang.syntax.PrcParser import PrcParser
+
 block_types = {
-    "func": 1,
-    "input": 1,
-    "observer": 1,
-    "while": 1,
-    "if": 1,
-    "else": 1
+    "func": func_block,
+    "input": input_block,
+    "observer": observer_block,
+    "while": while_block,
+    "if": if_block,
+    "else": else_block
 }
 
 line_types = {
-    "@name": 1,
-    "@import": 1,
-    "var": 1,
-    "chat": 1,
-    "selector": 1
+    "@name": config,
+    "@import": config,
+    "var": var,
+    "chat": chat,
+    "selector": selector,
+    "execute": execute,
 }
+
+
+def get_parser(base) -> Type[PrcParser]:
+    if base in block_types:
+        return block_types[base]
+    elif base in line_types:
+        return line_types[base]
+    else:
+        return default
 
 
 def preprocess(code: str):
@@ -49,11 +63,25 @@ def block_separator(mcc_code):
     return blocks[1:]
 
 
+meta = {}
+
+
+def parse_block(block):
+    base, args = block[0].split(" ", 1)
+    prcparser = get_parser(base)()
+    prc = prcparser.parse(args, meta)
+
+
 def get_prc_node(code):
     code = preprocess(code)
-    return parse(code)
+    result = parse_code(code)
+    return result
 
-def parse(code: str, parent=""):
+
+def parse_code(code: str):
     code = block_separator(code)
+    prc_list = []
+    for block in code:
+        prc_list.append(parse_block(block))
 
     return code
