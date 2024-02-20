@@ -1,3 +1,3 @@
 class PrcParser:
-    def parse(self, block, meta):
+    def parse(self, block, meta, base=None):
         pass

@@ -1,6 +1,46 @@
+import os
+
+from mclang.namespace import Namespace
 from mclang.syntax.field import *
 from typing import Type
 from mclang.syntax.PrcParser import PrcParser
+
+
+class NeccessaryMeta:
+    def __init__(self):
+        self.service_blocks = []
+        self.service_compiled = []
+        self.namespace = None
+
+    def setNamespace(self, namespace_name):
+        if self.namespace is not None:
+            self.namespace = self.namespace.copy(namespace_name)
+            return
+        self.namespace = Namespace(namespace_name)
+
+    def getNamespace(self):
+        if self.namespace is None:
+            raise ValueError("Namespace is None")
+        return self.namespace
+
+    def addBlock(self, block):
+        self.service_blocks.append(block)
+
+    def addCompiled(self, compiled: dict):
+        self.service_compiled.append(compiled)
+
+    def bulk_addCompiled(self, compiled: list):
+        for c in compiled:
+            self.addCompiled(c)
+
+    def parse_service_prc(self, meta_dict, cparser):
+        if not self.service_blocks:
+            return None
+        res = self.service_blocks[0]
+        res = cparser.parse_block(res, meta_dict)
+        self.service_blocks.pop(0)
+        return res
+
 
 block_types = {
     "func": func_block,
@@ -63,25 +103,40 @@ def block_separator(mcc_code):
     return blocks[1:]
 
 
-meta = {}
+class CodeParser:
+    def __init__(self, parent=None):
+        self.NMeta = NeccessaryMeta()
+        self.meta = {"NMETA": self.NMeta}
+        if parent is not None:
+            self.NMeta.setNamespace(parent)
 
+    def parse_block(self, block, meta_dict):
+        base, args = block[0].split(" ", 1)
+        prcparser = get_parser(base)()
+        prc = prcparser.parse(args, meta_dict, base=base)
+        return prc
 
-def parse_block(block):
-    base, args = block[0].split(" ", 1)
-    prcparser = get_parser(base)()
-    prc = prcparser.parse(args, meta)
+    def get_prc_node(self, file_path):
+        with open(file_path, "r", encoding="utf-8") as f:
+            code = f.read()
 
+        abs_path = file_path if file_path.startswith("/") else os.path.abspath(file_path)
+        folder_path = os.path.dirname(abs_path) + "/"
 
-def get_prc_node(code):
-    code = preprocess(code)
-    result = parse_code(code)
-    return result
+        self.meta["path"] = folder_path
 
+        code = preprocess(code)
+        result = self.parse_code(code)
+        result = [prc for prc in result if prc]
+        return result
 
-def parse_code(code: str):
-    code = block_separator(code)
-    prc_list = []
-    for block in code:
-        prc_list.append(parse_block(block))
+    def parse_code(self, code: str):
+        code = block_separator(code)
+        prc_list = []
+        for block in code:
+            prc_list.append(self.parse_block(block, self.meta))
+        while self.NMeta.service_blocks:
+            prc_list.append(self.NMeta.parse_service_prc(self.meta, self))
+        prc_list.extend(self.NMeta.service_compiled)
 
-    return code
+        return prc_list

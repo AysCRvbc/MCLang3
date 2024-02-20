@@ -1,6 +1,8 @@
 @name is_even
 
+chat system = ["# OUT #"]
+
 func check(x)
     if x % 2 == 0
-        return True
-    return False
+        system.log(@s, ["True"])
+    system.log(@s, ["False"])

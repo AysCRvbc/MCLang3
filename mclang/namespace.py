@@ -46,6 +46,6 @@ class Namespace:
         return self.functions[name]
 
     def copy(self, sub_name):
-        new_namespace = Namespace(self.global_name, sub_name=sub_name, variables=self.variables,
+        new_namespace = Namespace(self.prefix, sub_name=sub_name, variables=self.variables,
                                   functions=self.functions)
         return new_namespace

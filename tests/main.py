@@ -1,8 +1,9 @@
-import mclang.parser as parser
+import mclang.parser as pr
 
 filename = "examples/main.mcl"
 
-with open(filename, 'r', encoding='utf-8') as f:
-    code = f.read()
+parser = pr.CodeParser()
 
-res = parser.get_prc_node(code)
+res = parser.get_prc_node(filename)
+
+print(res)
