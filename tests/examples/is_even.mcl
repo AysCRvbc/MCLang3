@@ -4,7 +4,7 @@ var test
 test = 2
 chat system = ["# OUT #", test]
 
-system.log(@s, ["i wish it works"])
+system.log(@s, ["i wish it works, dude"], True)
 
 func check(x)
     if x % 2 == 0
