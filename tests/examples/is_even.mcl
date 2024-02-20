@@ -1,6 +1,10 @@
 @name is_even
 
-chat system = ["# OUT #"]
+var test
+test = 2
+chat system = ["# OUT #", test]
+
+system.log(@s, ["i wish it works"])
 
 func check(x)
     if x % 2 == 0

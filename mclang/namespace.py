@@ -1,7 +1,11 @@
 BASIC_VARIABLES = {
-    "True": 1,
-    "False": 0
+    "True": {"type": "const", "value": 1},
+    "False": {"type": "const", "value": 0},
+    "None": {"type": "const", "value": -1},
 }
+
+for key, val in BASIC_VARIABLES.items():
+    val["ignore"] = True
 
 
 class Namespace:
@@ -26,12 +30,12 @@ class Namespace:
             raise ValueError("Invalid variable name")
         return self.variables[name]
 
-    def setValue(self, name):
-        self.variables[name] = f"{self.prefix}_{name}"
+    def setValue(self, name, val_type):
+        self.variables[name] = {"type": val_type, "value": f"{self.prefix}_{name}"}
         return self.variables[name]
 
     def setLocal(self, name):
-        self.variables[name] = f"{self.prefix}_{name}"
+        self.variables[name]["value"] = f"{self.prefix}_{name}"
         return self.variables[name]
 
     def setFunction(self, name, sub_process=""):
