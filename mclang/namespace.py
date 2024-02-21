@@ -2,6 +2,11 @@ BASIC_VARIABLES = {
     "True": {"type": "const", "value": 1},
     "False": {"type": "const", "value": 0},
     "None": {"type": "const", "value": -1},
+    "@a": {"type": "selector", "value": "@a"},
+    "@s": {"type": "selector", "value": "@s"},
+    "@e": {"type": "selector", "value": "@e"},
+    "@p": {"type": "selector", "value": "@p"},
+    "@r": {"type": "selector", "value": "@r"}
 }
 
 for key, val in BASIC_VARIABLES.items():
@@ -27,7 +32,7 @@ class Namespace:
     def getValue(self, name):
         if name not in self.variables:
             print(name)
-            raise ValueError("Invalid variable name")
+            raise ValueError("Variable does not exists")
         return self.variables[name]
 
     def setValue(self, name, val_type):
@@ -46,6 +51,7 @@ class Namespace:
 
     def getFunction(self, name):
         if name not in self.functions:
+            print(name)
             raise ValueError("Function does not exists")
         return self.functions[name]
 

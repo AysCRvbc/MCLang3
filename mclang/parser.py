@@ -100,6 +100,8 @@ def block_separator(mcc_code):
             else:
                 blocks.append([line])
                 current_tabs = "" if line.startswith("    ") else "    "
+    for i, block in enumerate(blocks):
+        blocks[i] = block[:2]
     return blocks[1:]
 
 
@@ -113,7 +115,11 @@ class CodeParser:
     def parse_block(self, block, meta_dict):
         base, args = block[0].split(" ", 1)
         prcparser = get_parser(base)()
-        prc = prcparser.parse(args, meta_dict, base=base)
+        try:
+            prc = prcparser.parse(args, meta_dict, base=base, data=block)
+        except:
+            prcparser = default()
+            prc = prcparser.parse(args, meta_dict, base=base, data=block)
         return prc
 
     def get_prc_node(self, file_path):

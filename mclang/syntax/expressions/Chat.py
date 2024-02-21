@@ -1,5 +1,6 @@
 import mclang.syntax.PrcParser as Prc
 from mclang.namespace import Namespace
+import mclang.syntax.expressions.Selector as sct
 
 
 def split_array_to_json(array_string):
@@ -45,7 +46,7 @@ class Parser(Prc.PrcParser):
             return s
         else:
             return ns.getValue(s)
-    def parse(self, block, meta, base=None):
+    def parse(self, block, meta, base=None, data=None):
         ns: Namespace = meta["NMETA"].getNamespace()
         self.ns = ns
         name, arg = [o.strip() for o in block.split("=", 1)]
@@ -59,7 +60,7 @@ class Parser(Prc.PrcParser):
         ns.getValue(name)["pointer"] = self
 
     def log(self, args: list, meta):
-        selector = args[0]
+        selector = sct.getSelector(args[0], meta)
         msg = args[1]
         msg = split_array_to_json(msg)
 
@@ -81,7 +82,7 @@ class Parser(Prc.PrcParser):
                 res.append({"score": {"name": selector, "objective": m}})
         arg = str(res).replace("'", '"')
 
-        cmd = f"execute tellraw {selector} {arg}"
+        cmd = f"tellraw {selector} {arg}"
         res = {"type": "command", "value": [cmd]}
 
         return res

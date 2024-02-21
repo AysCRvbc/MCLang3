@@ -3,7 +3,7 @@ from mclang.namespace import Namespace
 
 
 class Parser(Prc.PrcParser):
-    def parse(self, block, meta, base=None):
+    def parse(self, block, meta, base=None, data=None):
         block = block.split()
         ns: Namespace = meta["NMETA"].getNamespace()
         ns.setValue(block[0], "scoreboard")

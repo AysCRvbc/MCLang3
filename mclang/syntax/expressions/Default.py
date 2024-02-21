@@ -2,13 +2,15 @@ import mclang.syntax.PrcParser as Prc
 import mclang.syntax.field as field
 import re
 
+
 regex_list = {
     r"^((?:\w+\.)?(?:\w+))\((.*?)\)$": field.lang_call,
+    r"(\w+)\s*=\s*(\w+)": field.lang_varset
 }
 
 
 class Parser(Prc.PrcParser):
-    def parse(self, block, meta, base=None):
+    def parse(self, block, meta, base=None, data=None):
         line = f"{base} {block}" # line recovery
         return self.parse_line(line, meta)
 

@@ -10,7 +10,7 @@ class Parser(Prc.PrcParser):
             "@import": self.importSet
         }
 
-    def parse(self, *args, base=None):
+    def parse(self, *args, base=None, data=None):
         return self.bases[base](*args)
 
     def nameSet(self, args, meta_dict):
