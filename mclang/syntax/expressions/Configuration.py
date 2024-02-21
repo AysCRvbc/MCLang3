@@ -35,4 +35,10 @@ class Parser(Prc.PrcParser):
                     continue
             key = f"{package}.{key}"
             ns.variables[key] = val
+        for key, val in ns_outer.functions.items():
+            if "ignore" in val:
+                if val["ignore"]:
+                    continue
+            key = f"{package}.{key}"
+            ns.functions[key] = val
 

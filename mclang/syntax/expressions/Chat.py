@@ -66,11 +66,12 @@ class Parser(Prc.PrcParser):
         msgs = []
         for m in msg:
             msgs.append(self.replaceValue(m))
-            if msgs[-1]['type'] == "scoreboard":
-                msgs[-1] = msgs[-1]['value']
-            else:
-                print(msgs[-1])
-                raise ValueError("Type not supported")
+            if not (isinstance(msgs[-1], str)):
+                if msgs[-1]['type'] == "scoreboard":
+                    msgs[-1] = msgs[-1]['value']
+                else:
+                    print(msgs[-1])
+                    raise ValueError("Type not supported")
 
         res = []
         for m in msgs:
@@ -80,4 +81,7 @@ class Parser(Prc.PrcParser):
                 res.append({"score": {"name": selector, "objective": m}})
         arg = str(res).replace("'", '"')
 
-        return f"execute tellraw {selector} {arg}"
+        cmd = f"execute tellraw {selector} {arg}"
+        res = {"type": "command", "value": [cmd]}
+
+        return res
