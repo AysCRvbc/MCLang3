@@ -1,3 +1,6 @@
+import mclang.syntax.expressions.Return as return_expr
+return_expr = return_expr.Parser
+
 import mclang.syntax.blocks.If as if_block
 if_block = if_block.Parser
 
@@ -36,6 +39,9 @@ lang_call = lang_call.Parser
 
 import mclang.syntax.expressions.lang.VariableSet as lang_varset
 lang_varset = lang_varset.Parser
+
+import mclang.syntax.expressions.lang.Unary as lang_unary
+lang_unary = lang_unary.Parser
 
 import mclang.syntax.expressions.Default as default
 default = default.Parser

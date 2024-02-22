@@ -58,6 +58,7 @@ line_types = {
     "chat": chat,
     "selector": selector,
     "execute": execute,
+    "return": return_expr
 }
 
 
