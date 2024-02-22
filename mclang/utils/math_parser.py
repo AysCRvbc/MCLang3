@@ -21,7 +21,7 @@ def get_operator_symbol(op):
         'LtE': '<~',
         'Gt': '>',
         'GtE': '>~',
-        'Eq': '~~',
+        'Eq': '~',
     }
     return operator_mapping[op]
 

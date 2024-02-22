@@ -1,5 +1,7 @@
 import mclang.syntax.PrcParser as Prc
 import mclang.utils.math_parser as mp
+from mclang.namespace import Namespace
+
 
 class Parser(Prc.PrcParser):
     def parse(self, block, meta, base=None, data=None):
@@ -12,8 +14,19 @@ class Parser(Prc.PrcParser):
             code = "\n".join(code)
             return meta["PARSER"].parse_code(code)
         else:
-            return self.setOperation(code, meta)
+            return self.setOperation([getter, setter[1]], meta)
 
     def setOperation(self, block, meta):
         print(block)
-        return None
+        res = []
+        getter = block[0]
+        setter = block[1]
+        ns: Namespace = meta["NMETA"].getNamespace()
+        if getter not in ns.variables:
+            ns.setValue(getter, "scoreboard")
+
+        if setter not in ns.variables:
+            raise Exception(f"{setter} is not defined")
+
+
+        return res

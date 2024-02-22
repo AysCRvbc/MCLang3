@@ -85,4 +85,4 @@ class Parser(Prc.PrcParser):
         cmd = f"tellraw {selector} {arg}"
         res = {"type": "command", "value": cmd}
 
-        return res
+        return [res]
