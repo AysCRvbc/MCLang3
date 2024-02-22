@@ -106,6 +106,16 @@ def block_separator(mcc_code):
     return blocks[1:]
 
 
+def recursive_array_unpack(array):
+    res = []
+    for el in array:
+        if isinstance(el, list):
+            res.extend(recursive_array_unpack(el))
+        else:
+            res.append(el)
+    return res
+
+
 class CodeParser:
     def __init__(self, parent=None):
         self.NMeta = NeccessaryMeta()
@@ -127,6 +137,7 @@ class CodeParser:
         code = preprocess(code)
         result = self.parse_code(code)
         result = [prc for prc in result if prc]
+        result = recursive_array_unpack(result)
         return result
 
     def get_prcs(self, file_path):

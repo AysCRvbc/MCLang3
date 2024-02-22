@@ -47,6 +47,7 @@ def parse_arguments(raw_arguments):
 class Parser(Prc.PrcParser):
     def alt_parse(self, block, meta, base=None):
         print("Это заявленная функция!")
+
     def parse(self, block, meta, base=None, data=None):
         data = parse_function_call(block)
         call_name = data['function_name']

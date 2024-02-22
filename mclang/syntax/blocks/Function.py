@@ -55,3 +55,6 @@ class Parser(Prc.PrcParser):
         prs.meta["NMETA"].setNamespace(func_name)
         prcs = prs.parse_prcs(data)
         prs.meta["NMETA"].namespace = ns
+
+        for i in prcs:
+            print(i)

@@ -75,7 +75,7 @@ class Parser(Prc.PrcParser):
             if operation in replace_dict:
                 operation = replace_dict[operation]
             res.append(f"execute execute if score @s {getter} {operation} @s {setter} run scoreboard set @s {getter} 1")
-            res.append(f"execute execute unless score @s {setter} {operation} @s {setter} run scoreboard set @s {getter} 1")
+            res.append(f"execute execute unless score @s {getter} {operation} @s {setter} run scoreboard set @s {getter} 1")
         else:
             res.append(f"execute scoreboard players operation @s {getter} {operation}= @s {setter}")
 
