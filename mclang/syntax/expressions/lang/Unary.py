@@ -81,9 +81,6 @@ class Parser(Prc.PrcParser):
 
         prs: parser.CodeParser = meta["PARSER"]
         code = "\n".join(res)
-        try:
-            prc_list = prs.parse_code(code)
-        except Exception as f:
-            print(f)
 
+        res = prs.parse_code(code)
         return res

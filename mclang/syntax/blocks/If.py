@@ -8,3 +8,4 @@ class Parser(Prc.PrcParser):
         prs_code = vs.Parser().parse(code, meta)
         for i in prs_code:
             print(i)
+        print()
