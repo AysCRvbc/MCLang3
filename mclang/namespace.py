@@ -35,6 +35,9 @@ class Namespace:
             raise ValueError("Variable does not exists")
         return self.variables[name]
 
+    def whoAmI(self):
+        return self.sub_name
+
     def getType(self, name: str):
         name = str(name)
         if name.isnumeric():
@@ -50,16 +53,20 @@ class Namespace:
         return self.variables[name]
 
     def setFunction(self, name, sub_process=""):
-        prefix = f"{self.global_name}"
+        prefix = f"{self.prefix}"
         if sub_process:
             prefix += f"_{sub_process}"
-        self.functions[name] = f'{prefix}_{name.replace(".", "_")}'
+        self.functions[name] = {}
+        self.functions[name]['name'] = f'{prefix}_{name.replace(".", "_")}'
+
+    def setFunctionField(self, name, key, val):
+        self.functions[name][key] = val
 
     def getFunction(self, name):
         if name not in self.functions:
             print(name)
             raise ValueError("Function does not exists")
-        return self.functions[name]
+        return self.functions[name]['name']
 
     def copy(self, sub_name):
         new_namespace = Namespace(self.prefix, sub_name=sub_name, variables=self.variables,

@@ -64,7 +64,7 @@ class Parser(Prc.PrcParser):
         msg = args[1]
         msg = split_array_to_json(msg)
 
-        msgs = []
+        msgs = self.base.copy()
         for m in msg:
             msgs.append(self.replaceValue(m))
             if not (isinstance(msgs[-1], str)):

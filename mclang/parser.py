@@ -11,12 +11,19 @@ class NeccessaryMeta:
         self.service_blocks = []
         self.service_compiled = []
         self.namespace = None
+        self.process: str = "Main"
 
     def setNamespace(self, namespace_name):
         if self.namespace is not None:
             self.namespace = self.namespace.copy(namespace_name)
             return
         self.namespace = Namespace(namespace_name)
+
+    def setProcess(self, process):
+        self.process = process
+
+    def clearProcess(self):
+        self.process = "Main"
 
     def getNamespace(self):
         if self.namespace is None:

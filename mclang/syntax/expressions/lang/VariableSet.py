@@ -45,4 +45,7 @@ class Parser(Prc.PrcParser):
     def sc_c(self, variables: list, meta):
         ns: Namespace = meta["NMETA"].getNamespace()
         variables[0] = ns.getValue(variables[0])["value"]
-        return [{"type": "command", "value": f"scoreboard players set @s {variables[0]} {variables[1]}"}]
+        setter = str(variables[1])
+        if not setter.isnumeric():
+            setter = ns.getValue(setter)["value"]
+        return [{"type": "command", "value": f"scoreboard players set @s {variables[0]} {setter}"}]

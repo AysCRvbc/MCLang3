@@ -1,10 +1,11 @@
 @name is_even
 
-chat system = ["# OUT #"]
+chat system = ["# OUT # "]
+selector mods = @a[tag=admin]
 
 system.log(@a, ["i wish it works, dude"])
 
-func check(x)
+func check(x) -> mods
     if x % 2 == 0
         system.log(@s, ["True"])
         return True

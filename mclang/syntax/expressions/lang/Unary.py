@@ -5,34 +5,18 @@ from mclang.namespace import Namespace
 
 
 def getNumName(operation):
-    if operation == "+":
-        sub_name = "plus_srvc"
-    elif operation == "-":
-        sub_name = "sub_srvc"
-    elif operation == "*":
-        sub_name = "mul_srvc"
-    elif operation == "/":
-        sub_name = "div_srvc"
-    elif operation == "%":
-        sub_name = "mod_srvc"
-    elif operation == ">":
-        sub_name = "gt_srvc"
-    elif operation == "<":
-        sub_name = "lt_srvc"
-    elif operation == ">~":
-        sub_name = "gte_srvc"
-    elif operation == "<~":
-        sub_name = "lte_srvc"
-    elif operation == "~":
-        sub_name = "eq_srvc"
-    else:
+    operations_mapping = {"+": "plus", "-": "sub", "*": "mul", "/": "div", "%": "mod",
+                          ">": "gt", "<": "lt", ">~": "gte", "<~": "lte", "~": "eq"}
+
+    sub_name = operations_mapping.get(operation)
+    if sub_name is None:
         raise SyntaxError(f"Operation {operation} is not supported YET")
 
-    return sub_name
+    return f"{sub_name}_srvc"
 
 
 def parse_string(input_string):
-    pattern = re.compile(r'^\s*(\w+)\s*([+\-*/%><~]{1,})=\s*(\w+)\s*$')
+    pattern = re.compile(r'^\s*(\w+)\s*([+\-*/%><~]+)=\s*(\w+)\s*$')
 
     match = pattern.match(input_string)
 
@@ -75,7 +59,7 @@ class Parser(Prc.PrcParser):
             if operation in replace_dict:
                 operation = replace_dict[operation]
             res.append(f"execute execute if score @s {getter} {operation} @s {setter} run scoreboard set @s {getter} 1")
-            res.append(f"execute execute unless score @s {getter} {operation} @s {setter} run scoreboard set @s {getter} 1")
+            res.append(f"execute execute unless score @s {getter} {operation} @s {setter} run scoreboard set @s {getter} 0")
         else:
             res.append(f"execute scoreboard players operation @s {getter} {operation}= @s {setter}")
 

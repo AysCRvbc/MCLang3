@@ -6,7 +6,7 @@ import re
 regex_list = {
     r"^((?:\w+\.)?(?:\w+))\((.*?)\)$": field.lang_call,
     r"(\w+)\s*=\s*(\w+)": field.lang_varset,
-    r"^\s*(\w+)\s*([+\-*/%><~]{1,}=)\s*(\w+)\s*$": field.lang_unary,
+    r'^\s*(\w+)\s*([+\-*/%><~]+)=\s*(\w+)\s*$': field.lang_unary,
 }
 
 
