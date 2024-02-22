@@ -52,7 +52,7 @@ class NeccessaryMeta:
 block_types = {
     "func": func_block,
     "input": input_block,
-    "observer": observer_block,
+    "observe": observer_block,
     "while": while_block,
     "if": if_block,
     "else": else_block
@@ -131,11 +131,17 @@ class CodeParser:
             self.NMeta.setNamespace(parent)
 
     def parse_block(self, block, meta_dict):
-        base, args = block[0].split(" ", 1)
+        base = block[0].split(" ", 1)
+        if len(base) == 1:
+            args = ""
+        else:
+            args = base[1]
+        base = base[0]
+
         prcparser = get_parser(base)()
         try:
             prc = prcparser.parse(args, meta_dict, base=base, data=block[-1])
-        except:
+        except Exception as e:
             prcparser = default()
             prc = prcparser.parse(args, meta_dict, base=base, data=block[-1])
         return prc
@@ -156,15 +162,18 @@ class CodeParser:
 
         self.meta["path"] = folder_path
 
-        return self.parse_prcs(code)
+        prc_list = self.parse_prcs(code)
+
+        while self.NMeta.service_blocks:
+            prc_list.append(self.NMeta.parse_service_prc(self.meta, self))
+        prc_list.extend(self.NMeta.service_compiled)
+
+        return prc_list
 
     def parse_code(self, code: str):
         code = block_separator(code)
         prc_list = []
         for block in code:
             prc_list.append(self.parse_block(block, self.meta))
-        while self.NMeta.service_blocks:
-            prc_list.append(self.NMeta.parse_service_prc(self.meta, self))
-        prc_list.extend(self.NMeta.service_compiled)
 
         return prc_list

@@ -16,7 +16,7 @@ def getNumName(operation):
 
 
 def parse_string(input_string):
-    pattern = re.compile(r'^\s*(\w+)\s*([+\-*/%><~]+)=\s*(\w+)\s*$')
+    pattern = re.compile(r'(?P<arg1>\b\w+(?:\.\w+)*)\s*(?P<operator>\+|-|/|\*|%|>|<|>~|<~|~)=\s*(?P<arg2>\b\w+(?:\.\w+)*|\d+)\b')
 
     match = pattern.match(input_string)
 

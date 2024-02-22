@@ -10,6 +10,3 @@ parser = pr.CodeParser()
 res = parser.get_prcs(filename)
 
 print(json.dumps(res, indent=2))
-# ns: Namespace = parser.NMeta.getNamespace()
-# for val, key in ns.variables.items():
-#     print(val, key)

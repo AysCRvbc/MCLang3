@@ -3,14 +3,14 @@ import mclang.parser as parser
 from mclang.namespace import Namespace
 import mclang.syntax.expressions.Selector as sct
 
-#аааааа, ужас!
+
+# аааааа, ужас!
 
 def parse_arguments(raw_arguments):
     arguments = []
     current_argument = ""
     in_quotes = False
     nesting_level = 0
-
 
     for char in raw_arguments:
         if nesting_level == 0 and char == ")":
@@ -39,6 +39,7 @@ class Parser(Prc.PrcParser):
     def __init__(self, ns: Namespace = None):
         self.selector = None
         self.ns = ns
+
     def parse(self, block, meta, base=None, data=None):
         prc_list = []
         func_name, args = block.split("(", 1)
@@ -61,10 +62,10 @@ class Parser(Prc.PrcParser):
         old_ns = ns
 
         args = parse_arguments(args)
+        args = [arg for arg in args if arg]
         for n, i in enumerate(args):
             prc_list.append(f"{i} = arg{n}")
             ns.setValue(f"arg{n}", "scoreboard")
-
 
         prs.meta = meta.copy()
         if self.ns is None:
@@ -78,4 +79,7 @@ class Parser(Prc.PrcParser):
         for i in prcs:
             cmds.append(i['value'])
 
-        nmeta.addCompiled({"type": "function", "data": cmds, "name": ns.getFunction(func_name), "selector": self.selector})
+        cmds.append(f"execute tag @s remove {ns.getFunction(func_name)}")
+
+        nmeta.addCompiled(
+            {"type": "function", "data": cmds, "name": ns.getFunction(func_name), "selector": self.selector})

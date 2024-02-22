@@ -1,3 +1,5 @@
+import re
+
 BASIC_VARIABLES = {
     "True": {"type": "const", "value": 1},
     "False": {"type": "const", "value": 0},
@@ -11,6 +13,8 @@ BASIC_VARIABLES = {
 
 for key, val in BASIC_VARIABLES.items():
     val["ignore"] = True
+
+tag_val = r"self\.(?P<name>[^.]+)"
 
 
 class Namespace:
@@ -40,6 +44,8 @@ class Namespace:
 
     def getType(self, name: str):
         name = str(name)
+        if re.match(tag_val, name):
+            return "tag"
         if name.isnumeric():
             return "const"
         return self.getValue(name)['type']

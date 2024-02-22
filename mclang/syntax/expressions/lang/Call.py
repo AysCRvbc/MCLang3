@@ -5,7 +5,7 @@ from mclang.namespace import Namespace
 
 
 def parse_function_call(line):
-    match = re.match(r"^((?:\w+\.)?\w+)\((.*?)\)$", line)
+    match = re.match(r"^((?:\w+\.)?\w+(?:\.\w+)*)\((.*?)\)$", line)
     if not match:
         return None
 

@@ -5,6 +5,7 @@ from mclang.namespace import Namespace
 pairs = {
     ("scoreboard", "scoreboard"): "sc_sc",
     ("scoreboard", "const"): "sc_c",
+    ("tag", "const"): "tag_const",
 }
 
 
@@ -12,7 +13,6 @@ class Parser(Prc.PrcParser):
     def parse(self, block, meta, base=None, data=None):
         getter, setter = [c.strip() for c in block.split("=", 1)]
         setter = mp.get_math_cmds(setter)
-        code = f"{getter} = {setter[1]}"
         if len(setter[0]) != 0:
             code = setter[0]
             code.append(f"{getter} = {setter[1]}")
@@ -49,3 +49,10 @@ class Parser(Prc.PrcParser):
         if not setter.isnumeric():
             setter = ns.getValue(setter)["value"]
         return [{"type": "command", "value": f"scoreboard players set @s {variables[0]} {setter}"}]
+
+    def tag_const(self, variables: list, meta):
+        tag = variables[0].split(".", 1)[1]
+        if variables[1] == "True":
+            return [{"type": "command", "value": f"tag @s add {tag}"}]
+        else:
+            return [{"type": "command", "value": f"tag @s remove {tag}"}]
