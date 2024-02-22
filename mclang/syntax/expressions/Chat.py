@@ -83,6 +83,6 @@ class Parser(Prc.PrcParser):
         arg = str(res).replace("'", '"')
 
         cmd = f"tellraw {selector} {arg}"
-        res = {"type": "command", "value": [cmd]}
+        res = {"type": "command", "value": cmd}
 
         return res

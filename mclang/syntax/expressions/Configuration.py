@@ -25,7 +25,7 @@ class Parser(Prc.PrcParser):
         args += ".mcl"
         args = meta_dict['path'] + args
         cparser = parser.CodeParser(parent=prefix)
-        prc_list = cparser.get_prc_node(args)
+        prc_list = cparser.get_prcs(args)
         meta_dict["NMETA"].bulk_addCompiled(prc_list)
 
         ns_outer: Namespace = cparser.NMeta.getNamespace()

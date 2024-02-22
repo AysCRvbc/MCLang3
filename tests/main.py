@@ -6,7 +6,7 @@ filename = "examples/main.mcl"
 
 parser = pr.CodeParser()
 
-res = parser.get_prc_node(filename)
+res = parser.get_prcs(filename)
 
 print(res)
 # ns: Namespace = parser.NMeta.getNamespace()

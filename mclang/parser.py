@@ -108,7 +108,7 @@ def block_separator(mcc_code):
 class CodeParser:
     def __init__(self, parent=None):
         self.NMeta = NeccessaryMeta()
-        self.meta = {"NMETA": self.NMeta}
+        self.meta = {"NMETA": self.NMeta, "PARSER": self}
         if parent is not None:
             self.NMeta.setNamespace(parent)
 
@@ -116,13 +116,19 @@ class CodeParser:
         base, args = block[0].split(" ", 1)
         prcparser = get_parser(base)()
         try:
-            prc = prcparser.parse(args, meta_dict, base=base, data=block)
+            prc = prcparser.parse(args, meta_dict, base=base, data=block[-1])
         except:
             prcparser = default()
-            prc = prcparser.parse(args, meta_dict, base=base, data=block)
+            prc = prcparser.parse(args, meta_dict, base=base, data=block[-1])
         return prc
 
-    def get_prc_node(self, file_path):
+    def parse_prcs(self, code: str):
+        code = preprocess(code)
+        result = self.parse_code(code)
+        result = [prc for prc in result if prc]
+        return result
+
+    def get_prcs(self, file_path):
         with open(file_path, "r", encoding="utf-8") as f:
             code = f.read()
 
@@ -131,10 +137,7 @@ class CodeParser:
 
         self.meta["path"] = folder_path
 
-        code = preprocess(code)
-        result = self.parse_code(code)
-        result = [prc for prc in result if prc]
-        return result
+        return self.parse_prcs(code)
 
     def parse_code(self, code: str):
         code = block_separator(code)
