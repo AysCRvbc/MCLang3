@@ -2,4 +2,5 @@ import mclang.syntax.PrcParser as Prc
 
 
 class Parser(Prc.PrcParser):
-    pass
+    def parse(self, block, meta, base=None, data=None):
+        print("EXECUTE: " + block)

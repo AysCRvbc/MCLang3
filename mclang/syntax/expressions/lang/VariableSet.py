@@ -2,6 +2,11 @@ import mclang.syntax.PrcParser as Prc
 import mclang.utils.math_parser as mp
 from mclang.namespace import Namespace
 
+pairs = {
+    ("scoreboard", "scoreboard"): "sc_sc",
+    ("scoreboard", "const"): "sc_c",
+}
+
 
 class Parser(Prc.PrcParser):
     def parse(self, block, meta, base=None, data=None):
@@ -17,16 +22,25 @@ class Parser(Prc.PrcParser):
             return self.setOperation([getter, setter[1]], meta)
 
     def setOperation(self, block, meta):
-        print(block)
-        res = []
         getter = block[0]
         setter = block[1]
         ns: Namespace = meta["NMETA"].getNamespace()
         if getter not in ns.variables:
             ns.setValue(getter, "scoreboard")
 
-        if setter not in ns.variables:
-            raise Exception(f"{setter} is not defined")
+        getter_type = ns.getType(getter)
+        setter_type = ns.getType(setter)
 
+        method = pairs[getter_type, setter_type]
+        method = getattr(self, method)
 
-        return res
+        return method([getter, setter], meta)
+
+    def sc_sc(self, variables: list, meta):
+        ns: Namespace = meta["NMETA"].getNamespace()
+        variables[0] = ns.getValue(variables[0])["value"]
+        variables[1] = ns.getValue(variables[1])["value"]
+        return {"type": "command", "value": f"scoreboard players operation @s {variables[0]} = @s {variables[1]}"}
+
+    def sc_c(self, variables: list, meta):
+        print("SC _ C NOT DEFINED")

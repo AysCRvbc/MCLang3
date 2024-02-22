@@ -1,5 +1,6 @@
 import re
 import mclang.syntax.PrcParser as Prc
+from mclang import parser
 from mclang.namespace import Namespace
 
 
@@ -78,8 +79,11 @@ class Parser(Prc.PrcParser):
         else:
             res.append(f"execute scoreboard players operation @s {getter} {operation}= @s {setter}")
 
-        print(res)
-        print()
-        res = []
+        prs: parser.CodeParser = meta["PARSER"]
+        code = "\n".join(res)
+        try:
+            prc_list = prs.parse_code(code)
+        except Exception as f:
+            print(f)
 
         return res

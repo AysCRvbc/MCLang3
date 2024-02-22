@@ -35,6 +35,12 @@ class Namespace:
             raise ValueError("Variable does not exists")
         return self.variables[name]
 
+    def getType(self, name: str):
+        name = str(name)
+        if name.isnumeric():
+            return "const"
+        return self.getValue(name)['type']
+
     def setValue(self, name, val_type):
         self.variables[name] = {"type": val_type, "value": f"{self.prefix}_{name}"}
         return self.variables[name]
