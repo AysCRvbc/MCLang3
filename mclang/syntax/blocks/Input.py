@@ -37,10 +37,6 @@ class Parser(Prc.PrcParser):
 
         prcs.append(parser.parse_code("\n".join(code_block)))
 
-        code_block = [f'observe {selector} -> {name}_tag_giver',
-                               f'    select tag = !{name}_tag']
-
-        prcs.append(parser.parse_code("\n".join(code_block)))
 
         code_block = [f'func {name}_tag_giver() -> {selector}',
                             f'    execute scoreboard players enable @s {ns.getValue(f"input_{raw_name}")["value"]}',
@@ -48,14 +44,20 @@ class Parser(Prc.PrcParser):
 
         prcs.append(parser.parse_code("\n".join(code_block)))
 
-        code_block = [f'observe {selector} -> {name}_function',
-                               f'    unless score @s {ns.getValue(f"input_{raw_name}")} matches 0']
-
-        prcs.append(parser.parse_code("\n".join(code_block)))
-
         code_block = [f'func {name}_function() -> {selector}',
                             f'    {arg} = input_{raw_name}',
                             f'    input_{raw_name} = 0',
                             f'    self.{name}_tag = False']
+        code_block.extend([ f'    {cmd}' for cmd in data.splitlines()])
+
+        prcs.append(parser.parse_code("\n".join(code_block)))
+
+        code_block = [f'observe {name}_tag_giver -> {selector}',
+                      f'    select tag = !{name}_tag']
+
+        prcs.append(parser.parse_code("\n".join(code_block)))
+
+        code_block = [f'observe {name}_function -> {selector}',
+                      f'    unless score @s {ns.getValue(f"input_{raw_name}")["value"]} matches 0']
 
         prcs.append(parser.parse_code("\n".join(code_block)))

@@ -50,6 +50,11 @@ class Namespace:
             return "const"
         return self.getValue(name)['type']
 
+    def prefixy(self, name, is_global=True):
+        if is_global:
+            return f"{self.global_name}_{name}"
+        return f"{self.prefix}_{name}"
+
     def setValue(self, name, val_type):
         self.variables[name] = {"type": val_type, "value": f"{self.prefix}_{name}"}
         return self.variables[name]
