@@ -70,9 +70,9 @@ class Parser(Prc.PrcParser):
         prs.meta = meta.copy()
         if self.ns is None:
             nmeta.setNamespace(func_name)
+        self.ns = nmeta.getNamespace()
         prcs = prs.parse_prcs("\n".join(prc_list) + "\n" + data)
         nmeta.namespace = old_ns
-        self.ns = ns
 
         cmds = []
 

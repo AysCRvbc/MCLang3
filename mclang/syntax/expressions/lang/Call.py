@@ -46,7 +46,16 @@ def parse_arguments(raw_arguments):
 
 class Parser(Prc.PrcParser):
     def alt_parse(self, block, meta, base=None):
-        pass # это вызов по типу func(args)
+        res = []
+        ns: Namespace = meta["NMETA"].getNamespace()
+        func = block.split("(", 1)[0]
+        func = ns.getFunction(func)
+        res.append(f"tag @s add {func}")
+
+        for i, e in enumerate(res):
+            res[i] = {"type": "command", "value": e}
+
+        return res
 
     def parse(self, block, meta, base=None, data=None):
         data = parse_function_call(block)

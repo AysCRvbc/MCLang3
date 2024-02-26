@@ -9,17 +9,35 @@ pairs = {
 }
 
 
+def recursive_array_unpack(array):
+    res = []
+    for el in array:
+        if isinstance(el, list):
+            res.extend(recursive_array_unpack(el))
+        else:
+            res.append(el)
+    return res
+
+
 class Parser(Prc.PrcParser):
     def parse(self, block, meta, base=None, data=None):
         getter, setter = [c.strip() for c in block.split("=", 1)]
-        setter = mp.get_math_cmds(setter)
+        setter = mp.get_math_cmds(setter, meta)
+        base = setter[2]
+        retval = []
+
         if len(setter[0]) != 0:
             code = setter[0]
             code.append(f"{getter} = {setter[1]}")
             code = "\n".join(code)
-            return meta["PARSER"].parse_code(code)
+            retval = meta["PARSER"].parse_code(code)
         else:
-            return self.setOperation([getter, setter[1]], meta)
+            retval = self.setOperation([getter, setter[1]], meta)
+
+        base.extend(retval)
+        base = recursive_array_unpack(base)
+
+        return base
 
     def setOperation(self, block, meta):
         getter = block[0]

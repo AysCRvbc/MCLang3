@@ -21,6 +21,7 @@ class NeccessaryMeta:
             self.namespace = self.namespace.copy(namespace_name)
             return
         self.namespace = Namespace(namespace_name)
+        return self.namespace
 
     def setProcess(self, process):
         self.process = process

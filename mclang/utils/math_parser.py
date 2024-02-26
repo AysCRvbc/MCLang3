@@ -1,5 +1,8 @@
 import ast
 
+from mclang.namespace import Namespace
+import mclang.parser as parser
+
 
 def parse_expression(expression):
     parsed = ast.parse(expression, mode='eval')
@@ -26,7 +29,24 @@ def get_operator_symbol(op):
     return operator_mapping[op]
 
 
-def get_math_cmds(expression):
+def getCallName(call: ast.Call):
+    data = call.func
+    if isinstance(data, ast.Attribute):
+        return getCallName(ast.Call(data.value)) + [data.attr]
+    elif isinstance(data, ast.Name):
+        return [data.id]
+    else:
+        raise Exception("Invalid call data")
+
+
+def getCallData(call: ast.Call):
+    name = getCallName(call)
+    name = ".".join(name)
+    args = [a.id for a in call.args]
+    return name, args
+
+
+def get_math_cmds(expression, meta):
     global temp_counter
     temp_counter = 0
 
@@ -38,6 +58,7 @@ def get_math_cmds(expression):
 
     final_result = []
     expression = parse_expression(expression)
+    payload = []
 
     def transform_expression(expr):
         if isinstance(expr, ast.BinOp):
@@ -70,6 +91,28 @@ def get_math_cmds(expression):
             final_result.append(f"{temp_var} {op}= {right}")
 
             return temp_var
+        elif isinstance(expr, ast.Call):
+            expr: ast.Call
+            data = getCallData(expr)
+            name = data[0]
+            args = data[1]
+
+            ns: Namespace = meta["NMETA"].getNamespace()
+            func = ns.getFunction(name, full=True)
+            funcns = func['prc'].ns
+            prs: parser.CodeParser = meta["PARSER"]
+            code = ""
+            for i, e in enumerate(args):
+                code += f"execute scoreboard operation @s {funcns.getValue(f'arg{i}')['value']} = @s {ns.getValue(e)['value']}\n"
+            code = code.splitlines()
+            code.append(f"{name}()")
+            payload.extend(code)
+
+            ns.setValue(f"{name}_retval", "scoreboard")
+            ns.getValue(f"{name}_retval")["value"] = funcns.getValue("retval")["value"]
+
+            return f"{name}_retval"
+
         elif isinstance(expr, ast.Expr):
             return transform_expression(expr.value)
         elif isinstance(expr, ast.Name):
@@ -81,4 +124,8 @@ def get_math_cmds(expression):
 
     temp_var = transform_expression(expression)
 
-    return final_result, temp_var
+    prs: parser.CodeParser = meta["PARSER"]
+    for i, e in enumerate(payload):
+        payload[i] = prs.parse_code(e)
+
+    return final_result, temp_var, payload
