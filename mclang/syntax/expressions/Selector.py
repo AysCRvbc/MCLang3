@@ -1,15 +1,20 @@
 import mclang.syntax.PrcParser as Prc
 from mclang.namespace import Namespace
 
+
 def parse_arguments(raw_arguments):
     arguments = []
     current_argument = ""
     in_quotes = False
     nesting_level = 0
     for char in raw_arguments:
-        if char == "," and nesting_level == 0 and not in_quotes:
+        if nesting_level == 0 and (char == ")" or char == "]"):
+            break
+        elif char == "," and nesting_level == 0 and not in_quotes:
             arguments.append(current_argument.strip())
             current_argument = ""
+        elif char == " " and (not in_quotes):
+            pass
         elif char == "'" or char == '"':
             current_argument += char
             in_quotes = not in_quotes
@@ -34,18 +39,23 @@ def getSelector(name: str, meta):
         return ns.getValue(name)['value']
 
     base = name[:f_sq]
-    mods = name[f_sq+1:-1]
+    mods = name[f_sq + 1:-1]
     base_selector = ns.getValue(base)['value']
     base_mods = parse_arguments(mods)
     base = base_selector
     f_sq = base_selector.find("[")
     if f_sq != -1:
-        mods_start = base_selector[f_sq+1:-1]
+        mods_start = base_selector[f_sq + 1:-1]
         start_mods = parse_arguments(mods_start)
         base_mods.extend(start_mods)
         base = base_selector[:f_sq]
 
-    return f"{base}[{','.join(base_mods)}]"
+    mods = f"[{','.join(base_mods)}]"
+    if mods == "[]":
+        mods = ""
+
+    return f"{base}{mods}"
+
 
 class Parser(Prc.PrcParser):
     def parse(self, block, meta, base=None, data=None):
