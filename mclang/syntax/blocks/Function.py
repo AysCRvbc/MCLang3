@@ -83,3 +83,8 @@ class Parser(Prc.PrcParser):
 
         nmeta.addCompiled(
             {"type": "function", "data": cmds, "name": ns.getFunction(func_name), "selector": self.selector})
+
+        caller_cmds = [f'tag @s add {ns.getFunction(func_name)}']
+        nmeta.addCompiled(
+            {"type": "function", "data": caller_cmds, "name": ns.getFunction(func_name) + "_caller", "selector": self.selector}
+        )

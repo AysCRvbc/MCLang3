@@ -22,6 +22,7 @@ class Namespace:
         self.prefix = global_name
         self.global_name = global_name
         self.sub_name = sub_name
+
         if sub_name:
             self.prefix += f"_{sub_name}"
         if variables is None:
@@ -73,10 +74,13 @@ class Namespace:
     def setFunctionField(self, name, key, val):
         self.functions[name][key] = val
 
-    def getFunction(self, name):
+    def getFunction(self, name, full=False):
         if name not in self.functions:
             print(name)
             raise ValueError("Function does not exists")
+        retval = self.functions[name]
+        if full:
+            return retval
         return self.functions[name]['name']
 
     def copy(self, sub_name):

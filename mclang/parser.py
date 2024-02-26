@@ -13,6 +13,9 @@ class NeccessaryMeta:
         self.namespace = None
         self.process: str = "Main"
 
+        self.level = 0
+        self.index = 0
+
     def setNamespace(self, namespace_name):
         if self.namespace is not None:
             self.namespace = self.namespace.copy(namespace_name)
@@ -140,10 +143,11 @@ class CodeParser:
 
         prcparser = get_parser(base)()
         try:
-            prc = prcparser.parse(args, meta_dict, base=base, data=block[-1])
+            prc = prcparser.process(args, meta_dict, base=base, data=block[-1])
         except Exception as e:
+            print(e)
             prcparser = default()
-            prc = prcparser.parse(args, meta_dict, base=base, data=block[-1])
+            prc = prcparser.process(args, meta_dict, base=base, data=block[-1])
         return prc
 
     def parse_prcs(self, code: str):
