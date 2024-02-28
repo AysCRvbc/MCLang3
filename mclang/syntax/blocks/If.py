@@ -7,16 +7,18 @@ from mclang.namespace import Namespace
 class Parser(Prc.PrcParser):
     def __init__(self):
         self.cond = None
+
     def parse(self, block, meta, base=None, data=None):
+        nmeta = meta["NMETA"]
         ns: Namespace = meta["NMETA"].getNamespace()
         parser: pr.CodeParser = meta["PARSER"]
-        ns.setValue("temp", "scoreboard", meta="dummy")
-        code = f"temp = {block}"
+        tempvar = f"ifvar{nmeta.level}_{nmeta.index}"
+        ns.setValue(tempvar, "scoreboard", meta="dummy")
+        code = f"{tempvar} = {block}"
         prs_code = vs.Parser().parse(code, meta)
 
-
-        self.cond = f"score @s {ns.getValue('temp')['value']} matches 1 run "
-        base = f"execute if {self.cond}"
+        self.cond = f"score @s {ns.getValue(tempvar)['value']}"
+        base = f"execute if {self.cond} matches 1 run "
 
         prc_list2 = parser.parse_prcs(data)
         cmds = []

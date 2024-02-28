@@ -58,7 +58,8 @@ class Parser(Prc.PrcParser):
         ns: Namespace = meta["NMETA"].getNamespace()
         variables[0] = ns.getValue(variables[0])["value"]
         variables[1] = ns.getValue(variables[1])["value"]
-        return [{"type": "command", "value": f"scoreboard players operation @s {variables[0]} = @s {variables[1]}"}]
+        res = [{"type": "command", "value": f"scoreboard players operation @s {variables[0]} = @s {variables[1]}"}]
+        return res
 
     def sc_c(self, variables: list, meta):
         ns: Namespace = meta["NMETA"].getNamespace()

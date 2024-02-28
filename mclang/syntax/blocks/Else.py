@@ -13,7 +13,7 @@ class Parser(Prc.PrcParser):
         if not isinstance(prevb, If.Parser):
             raise Exception("else block must be in if block")
 
-        base = f"execute unless {prevb.cond}"
+        base = f"execute if {prevb.cond} matches 0 run "
 
         prc_list2 = parser.parse_prcs(data)
         cmds = []

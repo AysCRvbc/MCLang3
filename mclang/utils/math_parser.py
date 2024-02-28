@@ -103,7 +103,7 @@ def get_math_cmds(expression, meta):
             prs: parser.CodeParser = meta["PARSER"]
             code = ""
             for i, e in enumerate(args):
-                code += f"execute scoreboard operation @s {funcns.getValue(f'arg{i}')['value']} = @s {ns.getValue(e)['value']}\n"
+                code += f"execute scoreboard players operation @s {funcns.getValue(f'arg{i}')['value']} = @s {ns.getValue(e)['value']}\n"
             code = code.splitlines()
             code.append(f"{name}()")
             payload.extend(code)

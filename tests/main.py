@@ -10,4 +10,7 @@ parser = pr.CodeParser()
 
 res = parser.get_prcs(filename)
 
-print(mcj.getBuilding(res, log=False))
+res = mcj.getBuilding(res, log=True, center=(-16, -61, 11))
+
+for big_cmd in res:
+    print(big_cmd)

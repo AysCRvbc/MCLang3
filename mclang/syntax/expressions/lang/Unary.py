@@ -58,8 +58,13 @@ class Parser(Prc.PrcParser):
                             "<~": "<="}
             if operation in replace_dict:
                 operation = replace_dict[operation]
-            res.append(f"execute execute if score @s {getter} {operation} @s {setter} run scoreboard set @s {getter} 1")
-            res.append(f"execute execute unless score @s {getter} {operation} @s {setter} run scoreboard set @s {getter} 0")
+
+            tempvar = "comptemp"
+            tempvar = ns.setValue(tempvar, "scoreboard", meta="dummy")['value']
+
+            res.append(f"execute execute if score @s {getter} {operation} @s {setter} run scoreboard players set @s {tempvar} 1")
+            res.append(f"execute execute unless score @s {getter} {operation} @s {setter} run scoreboard players set @s {tempvar} 0")
+            res.append(f"execute scoreboard players operation @s {getter} = @s {tempvar}")
         else:
             res.append(f"execute scoreboard players operation @s {getter} {operation}= @s {setter}")
 
