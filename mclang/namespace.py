@@ -60,6 +60,9 @@ class Namespace:
 
     def setValue(self, name, val_type, meta=None):
         self.variables[name] = {"type": val_type, "value": f"{self.prefix}_{name}"}
+        if name.startswith("self."):
+            val_type = "tag"
+            self.variables[name] = {"type": val_type, "value": f"{self.prefix}_{name}"}
         if val_type == "scoreboard":
             if meta is None:
                 raise ValueError("Scoreboard variable must have an object")

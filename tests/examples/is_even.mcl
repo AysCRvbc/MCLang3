@@ -2,7 +2,7 @@
 
 chat system = ["# OUT # "]
 
-system.log(@a, ["i wish it works, dude"])
+system.log(@a, ["i wish it works"])
 
 func check(x) -> @a
     if x % 2 == 0
