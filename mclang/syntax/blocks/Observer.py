@@ -49,6 +49,7 @@ class Parser(Prc.PrcParser):
         selector = sct.getSelector(selector, meta)
 
         res = {
+            "type": "observer",
             "call": target_func,
             "selector": selector,
             "additionals": additionals,
