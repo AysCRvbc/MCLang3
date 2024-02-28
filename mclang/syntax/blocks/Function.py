@@ -39,6 +39,7 @@ class Parser(Prc.PrcParser):
     def __init__(self, ns: Namespace = None):
         self.selector = None
         self.ns = ns
+        self.n = 0
 
     def parse(self, block, meta, base=None, data=None):
         prc_list = []
@@ -57,9 +58,10 @@ class Parser(Prc.PrcParser):
         ns: Namespace = self.ns
         if self.ns is None:
             ns = nmeta.getNamespace()
-            ns.setFunction(func_name)
-            ns.setFunctionField(func_name, "prc", self)
         old_ns = ns
+
+        ns.setFunction(func_name)
+        ns.setFunctionField(func_name, "prc", self)
 
         args = parse_arguments(args)
         args = [arg for arg in args if arg]

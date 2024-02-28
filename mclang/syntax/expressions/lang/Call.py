@@ -2,6 +2,7 @@ import mclang.syntax.PrcParser as Prc
 import re
 
 from mclang.namespace import Namespace
+import mclang.parser as pr
 
 
 def parse_function_call(line):
@@ -47,10 +48,19 @@ def parse_arguments(raw_arguments):
 class Parser(Prc.PrcParser):
     def alt_parse(self, block, meta, base=None):
         res = []
-        ns: Namespace = meta["NMETA"].getNamespace()
+        nmeta: pr.NeccessaryMeta = meta["NMETA"]
+        ns: Namespace = nmeta.getNamespace()
         func = block.split("(", 1)[0]
         func = ns.getFunction(func)
-        res.append(f"tag @s add {func}")
+        process = nmeta.process
+        process = ns.getFunction(process, full=True)
+        process_prc = process['prc']
+        process = process['name']
+
+        res.append(f"tag @s add {func}_caller")
+        res.append(f"tag @s remove {func}_ended")
+        res.append(f"tag @s add {process}_waiter{process_prc.n}")
+        res.append(f"//block {func}_ended")
 
         for i, e in enumerate(res):
             res[i] = {"type": "command", "value": e}

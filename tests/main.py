@@ -9,4 +9,4 @@ parser = pr.CodeParser()
 
 res = parser.get_prcs(filename)
 
-# print(json.dumps(res, indent=2))
+print(json.dumps(res, indent=2))

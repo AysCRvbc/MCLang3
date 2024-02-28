@@ -1,6 +1,7 @@
 import mclang.syntax.PrcParser as Prc
 import mclang.parser as parser
 import mclang.syntax.blocks.Function as func
+from mclang.namespace import Namespace
 
 
 class Parser(Prc.PrcParser):
@@ -37,4 +38,6 @@ class Parser(Prc.PrcParser):
         data = "\n".join(data)
 
         service_prcs = func.Parser(ns=funcns).process(block, meta, base=base, data=data)
+        return prs.parse_code(f"{name}()")
+
 
