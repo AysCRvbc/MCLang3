@@ -93,7 +93,6 @@ class Parser(Prc.PrcParser):
         for i in prcs:
             cmds.append(i['value'])
 
-        cmds.append(f"tag @s remove {ns.getFunction(func_name)}")
         caller_cmds = [f'tag @s add {ns.getFunction(func_name)}']
         nmeta.addCompiled(
             {"type": "function", "data": caller_cmds, "name": ns.getFunction(func_name) + "_caller", "selector": self.selector}
