@@ -64,10 +64,12 @@ class Namespace:
         self.variables[name]["value"] = f"{self.prefix}_{name}"
         return self.variables[name]
 
-    def setFunction(self, name, sub_process=""):
+    def setFunction(self, name, sub_process="", is_global=False):
         prefix = f"{self.prefix}"
         if sub_process:
             prefix += f"_{sub_process}"
+        if is_global:
+            prefix = self.global_name
         self.functions[name] = {}
         self.functions[name]['name'] = f'{prefix}_{name.replace(".", "_")}'
 

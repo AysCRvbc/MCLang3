@@ -13,7 +13,9 @@ class PrcParser:
             nmeta.level = list(levels).index(process)
             nmeta.index = levels[process]
 
-        return self.parse(block, meta, base=base, data=data)
+        res = self.parse(block, meta, base=base, data=data)
+        nmeta.prevBlock = self
+        return res
 
     def parse(self, block, meta, base=None, data=None):
         pass

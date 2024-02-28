@@ -12,6 +12,7 @@ class NeccessaryMeta:
         self.service_compiled = []
         self.namespace = None
         self.process: str = "Main"
+        self.prevBlock = None
 
         self.level = 0
         self.index = 0
