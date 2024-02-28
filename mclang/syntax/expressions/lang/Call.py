@@ -52,14 +52,9 @@ class Parser(Prc.PrcParser):
         ns: Namespace = nmeta.getNamespace()
         func = block.split("(", 1)[0]
         func = ns.getFunction(func)
-        process = nmeta.process
-        process = ns.getFunction(process, full=True)
-        process_prc = process['prc']
-        process = process['name']
 
         res.append(f"tag @s add {func}_caller")
         res.append(f"tag @s remove {func}_ended")
-        res.append(f"tag @s add {process}_waiter{process_prc.n}")
         res.append(f"//block {func}_ended")
 
         for i, e in enumerate(res):

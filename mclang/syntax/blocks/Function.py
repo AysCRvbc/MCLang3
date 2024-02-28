@@ -40,6 +40,7 @@ class Parser(Prc.PrcParser):
         self.selector = None
         self.ns = ns
         self.n = 0
+        self.nNow = 0
         self.name = None
         self.added = []
         self.parser: parser.CodeParser = None
@@ -101,12 +102,6 @@ class Parser(Prc.PrcParser):
         self.func_name = ns.getFunction(func_name)
         nmeta.addCompiled(self.getJson(cmds))
 
-
-
-        # nmeta.addCompiled(
-        #     {"type": "function", "data": cmds, "name": ns.getFunction(func_name), "selector": self.selector})
-        #
-
     def getJson(self, cmds, blocked = False) -> dict:
         pre_block = cmds
         post_block = []
@@ -123,17 +118,28 @@ class Parser(Prc.PrcParser):
 
         cmds = pre_block
 
+        inserted = {}
         for i, cmd in enumerate(cmds):
             if "//block" in cmd:
                 name = self.func_name
-                if self.n > 0:
-                    name += f"_{self.n}"
+                if self.nNow > 0:
+                    name += f"_{self.nNow}"
+                self.nNow += 1
                 ccc = f"tag @s remove {name}"
-                cmds[i] = cmds[i].split("//block")[0] + ccc
+                base = cmds[i].split("//block")[0]
+                cmds[i] = base + ccc
+                inserted[i] = f"tag @s add {self.func_name}_waiter{self.nNow}"
+                inserted[i] = base + inserted[i]
+
+        added = 0
+        for i in inserted:
+            cmds.insert(i+added, inserted[i])
+            added += 1
 
         if block:
             self.n += 1
             name = self.n
+            self.nNow -= 1
             self.added.append(self.getJson(post_block, blocked=True))
             self.added[-1]["name"] += f"_{name}"
 
@@ -149,9 +155,9 @@ class Parser(Prc.PrcParser):
 
             triggerBlock = [
                 f"observe {self.func_name.split('_', 1)[1]}_{name} -> {self.selector}",
-                f"    select tag = {self.ns.prefixy(block.split('_', 1)[1], True)}",
-                f"    select tag = {self.ns.prefixy(self.func_name.split('_', 1)[1], True)}_waiter{name}",
-                f"    delete {self.ns.prefixy(block.split('_', 1)[1], True)}"
+                f"    select tag = {self.ns.prefixy(block.split('_', 1)[1], is_global=True)}",
+                f"    select tag = {self.func_name}_waiter{name}",
+                f"    delete {self.ns.prefixy(block.split('_', 1)[1], is_global=True)}",
             ]
             triggerBlock = "\n".join(triggerBlock)
 
