@@ -37,18 +37,18 @@ def string_check(s):
 
 class Parser(Prc.PrcParser):
     def __init__(self):
-        self.ns = None
+        self.nmeta = None
         self.base = None
 
     def replaceValue(self, s):
-        ns: Namespace = self.ns
+        ns: Namespace = self.nmeta.getNamespace()
         if string_check(s):
             return s
         else:
             return ns.getValue(s)
     def parse(self, block, meta, base=None, data=None):
         ns: Namespace = meta["NMETA"].getNamespace()
-        self.ns = ns
+        self.nmeta = meta["NMETA"]
         name, arg = [o.strip() for o in block.split("=", 1)]
 
         base = split_array_to_json(arg)
@@ -63,6 +63,7 @@ class Parser(Prc.PrcParser):
         selector = sct.getSelector(args[0], meta)
         msg = args[1]
         msg = split_array_to_json(msg)
+
 
         msgs = self.base.copy()
         for m in msg:

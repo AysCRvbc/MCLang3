@@ -10,6 +10,7 @@ input value(num) -> players #Блоки кода всё ещё тупо табу
     y_d = num
     while y_d >= 0
         res = is_even.check(y_d) # Импорты теперь вот так работают!!!
+        system.log(@s, ["y_d = ", y_d, " -> ", res])
         y_d -= 1
 
     system.log(@s, ["Цикл Закончен"])

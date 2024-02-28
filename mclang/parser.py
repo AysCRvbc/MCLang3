@@ -31,9 +31,13 @@ class NeccessaryMeta:
     def clearProcess(self):
         self.process = "Main"
 
-    def getNamespace(self):
+    def getNamespace(self, local=False):
         if self.namespace is None:
             raise ValueError("Namespace is None")
+        if local:
+            func = self.process
+            ns = self.namespace.getFunction(func, full=True)['prc'].ns
+            return ns
         return self.namespace
 
     def addBlock(self, block):
