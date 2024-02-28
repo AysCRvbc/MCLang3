@@ -10,7 +10,7 @@ class Parser(Prc.PrcParser):
     def parse(self, block, meta, base=None, data=None):
         ns: Namespace = meta["NMETA"].getNamespace()
         parser: pr.CodeParser = meta["PARSER"]
-        ns.setValue("temp", "scoreboard")
+        ns.setValue("temp", "scoreboard", meta="dummy")
         code = f"temp = {block}"
         prs_code = vs.Parser().parse(code, meta)
 

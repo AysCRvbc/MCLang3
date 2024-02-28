@@ -16,6 +16,8 @@ for key, val in BASIC_VARIABLES.items():
 
 tag_val = r"self\.(?P<name>[^.]+)"
 
+scoreboard_variables = []
+
 
 class Namespace:
     def __init__(self, global_name, sub_name="", variables: dict = None, functions: dict = None):
@@ -56,8 +58,13 @@ class Namespace:
             return f"{self.global_name}_{name}"
         return f"{self.prefix}_{name}"
 
-    def setValue(self, name, val_type):
+    def setValue(self, name, val_type, meta=None):
         self.variables[name] = {"type": val_type, "value": f"{self.prefix}_{name}"}
+        if val_type == "scoreboard":
+            if meta is None:
+                raise ValueError("Scoreboard variable must have an object")
+            self.variables[name]['objectives'] = meta
+            scoreboard_variables.append(self.variables[name])
         return self.variables[name]
 
     def setLocal(self, name):

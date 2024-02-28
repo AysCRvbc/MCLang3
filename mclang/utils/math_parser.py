@@ -108,7 +108,7 @@ def get_math_cmds(expression, meta):
             code.append(f"{name}()")
             payload.extend(code)
 
-            ns.setValue(f"{name}_retval", "scoreboard")
+            ns.setValue(f"{name}_retval", "scoreboard", meta="dummy")
             ns.getValue(f"{name}_retval")["value"] = funcns.getValue("retval")["value"]
 
             return f"{name}_retval"

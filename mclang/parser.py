@@ -1,6 +1,7 @@
 import os
 
 from mclang.namespace import Namespace
+import mclang.namespace as nslib
 from mclang.syntax.field import *
 from typing import Type
 from mclang.syntax.PrcParser import PrcParser
@@ -173,6 +174,11 @@ class CodeParser:
         while self.NMeta.service_blocks:
             prc_list.append(self.NMeta.parse_service_prc(self.meta, self))
         prc_list.extend(self.NMeta.service_compiled)
+
+        for i in nslib.scoreboard_variables:
+            prc_list.insert(0,
+                    {"type": "command",
+                             "value": f"scoreboard objectives add {i['value']} {i['objectives']}"})
 
         return prc_list
 

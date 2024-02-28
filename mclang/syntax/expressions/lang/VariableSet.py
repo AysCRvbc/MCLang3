@@ -44,7 +44,7 @@ class Parser(Prc.PrcParser):
         setter = block[1]
         ns: Namespace = meta["NMETA"].getNamespace()
         if getter not in ns.variables:
-            ns.setValue(getter, "scoreboard")
+            ns.setValue(getter, "scoreboard", meta="dummy")
 
         getter_type = ns.getType(getter)
         setter_type = ns.getType(setter)

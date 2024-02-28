@@ -79,7 +79,7 @@ class Parser(Prc.PrcParser):
         args = [arg for arg in args if arg]
         for n, i in enumerate(args):
             prc_list.append(f"{i} = arg{n}")
-            ns.setValue(f"arg{n}", "scoreboard")
+            ns.setValue(f"arg{n}", "scoreboard", meta="dummy")
 
         prs.meta = meta.copy()
         if self.ns is None:

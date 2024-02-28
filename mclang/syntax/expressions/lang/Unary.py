@@ -45,7 +45,7 @@ class Parser(Prc.PrcParser):
         if setter.isnumeric():
             sub_name = getNumName(operation)
             res.append(f"{sub_name} = {setter}")
-            setter = ns.setValue(sub_name, "scoreboard")['value']
+            setter = ns.setValue(sub_name, "scoreboard", meta="dummy")['value']
         else:
             setter = ns.getValue(setter)["value"]
 
