@@ -139,8 +139,11 @@ class Parser(Prc.PrcParser):
             self.n += 1
             name = self.n
             self.nNow -= 1
-            self.added.append(self.getJson(post_block, blocked=True))
-            self.added[-1]["name"] += f"_{name}"
+            subFunc = self.getJson(post_block, blocked=True)
+            subCmds = subFunc["data"]
+            subFunc["name"] += f"_{name}"
+            subFunc["data"] = replaceGlobalToLocalExit(self.func_name, subFunc["name"], subCmds)
+            self.added.append(subFunc)
 
             self.added[-1]["data"].insert(0,
                 f"tag @s remove {self.func_name}_waiter{name}")
@@ -167,3 +170,9 @@ class Parser(Prc.PrcParser):
 
         return {"type": "function", "data": cmds, "name": self.func_name, "selector": self.selector}
 
+
+def replaceGlobalToLocalExit(process, local, cmds):
+    for i, e in enumerate(cmds):
+        if e.endswith(f"tag @s remove {process}"):
+            cmds[i] = e.replace(f"tag @s remove {process}", f"tag @s remove {local}")
+    return cmds

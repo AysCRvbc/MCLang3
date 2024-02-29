@@ -2,14 +2,24 @@
 @import is_even # импорты теперь вот такие вот
 
 var y_d # Теперь если кол-во параметров 2, то используется тип скора dummy
+var bool
 
 chat system = ["# CCTEST #"]
 selector players = @a # Новый тип данных
 
+input boolval(num) -> players
+    bool = num
+    system.log(@s, ["bool = ", bool])
+
+func say() -> @a
+    system.log(@s, ["Да, это четное число!"])
+
 input value(num) -> players #Блоки кода всё ещё тупо табуляцией
     y_d = num
     while y_d >= 0
-        res = is_even.check(y_d) # Импорты теперь вот так работают!!!
+        res = is_even.check(y_d, bool) # Импорты теперь вот так работают!!!
+        if res == 1
+            say()
         system.log(@s, ["y_d = ", y_d, " -> ", res])
         y_d -= 1
 

@@ -1,6 +1,18 @@
 @name is_even
 
-func check(x) -> @a
+chat system = ["iseven -> "]
+
+func sayTrue() -> @a
+    system.log(@s, ["True"])
+
+func sayFalse() -> @a
+    system.log(@s, ["False"])
+
+func check(x, bool) -> @a
     if x % 2 == 0
+        if bool == 1
+            sayTrue()
         return True
+    if bool == 1
+        sayFalse()
     return False
