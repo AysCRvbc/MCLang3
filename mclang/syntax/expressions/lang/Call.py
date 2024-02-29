@@ -58,7 +58,7 @@ class Parser(Prc.PrcParser):
         res.append(f"tag @s add {func}_caller")
         # res.append(f"tag @s remove {func}_ended")
         prc.newBlock()
-        res.append(f"//block {prc.nBlock} {func}_ended")
+        res.append(f"#block {prc.nBlock} {func}_ended")
 
         for i, e in enumerate(res):
             res[i] = {"type": "command", "value": e}

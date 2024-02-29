@@ -35,6 +35,24 @@ def parse_arguments(raw_arguments):
     return arguments
 
 
+def getComment(line):
+    comment_start = line.find('#')
+    if comment_start == -1:
+        return ''
+
+    in_string = False
+    c_n = 0
+    for c in line:
+        if c == '"':
+            if in_string:
+                return getComment(line[c_n+1:])
+            in_string = not in_string
+        elif c == "#":
+            if not in_string:
+                return line[c_n:]
+        c_n += 1
+
+
 class Parser(Prc.PrcParser):
     def __init__(self, ns: Namespace = None):
         self.selector = None
@@ -101,7 +119,7 @@ class Parser(Prc.PrcParser):
         )
 
         self.func_name = ns.getFunction(func_name)
-        cmds = self.preHandling(cmds, func_name)
+        cmds = self.preHandling(cmds, self.func_name)
         nmeta.addCompiled(self.getJson(cmds))
 
     def newBlock(self):
@@ -109,21 +127,46 @@ class Parser(Prc.PrcParser):
 
     def preHandling(self, cmds, waiter_name):
         for i, e in enumerate(cmds):
-            if "//block" in e:
-                base, block = e.split("//block", 1)
-                waiter, block = block.split(" ", 1)
-                # cmds[i] = []
-                # cmds.append() # нужно добавить waiter и выйти из текущей функции
-
-        for i in cmds:
-            print(f"command in func -> {i}")
-        print()
-        return []
+            e = getComment(e)
+            if e.startswith("#block"):
+                base = cmds[i].split(e)[0]
+                block = e.split("#block")[1].strip()
+                waiter, blocker = block.split(" ", 1)
+                waiter = f"{waiter_name}_waiter{waiter}"
+                cmds[i] = {
+                    "waiter": waiter,
+                    "blocker": blocker,
+                    "base": base
+                }
+        return cmds
 
     def getJson(self, cmds, blocked = False) -> dict:
-        pre_block = cmds
+        pre_block = []
         post_block = []
-        block = None
+        blocker = None
+        waiter = None
+        base = None
+
+        # for i, cmd in enumerate(cmds):
+        #     if isinstance(cmd, dict):
+        #         waiter = cmd['waiter']
+        #         blocker = cmd['blocker']
+        #         base = cmd['base']
+        #         pre_block = cmds[:i]
+        #         post_block = cmds[i+1:]
+        #         break
+        # else:
+        #     pre_block = cmds
+        #
+        # if post_block:
+        #     pre_block.append(base + f"tag @s add {waiter}")
+        #     pre_block.append(base + f"tag @s remove {self.func_name}")
+        #
+        # elif not post_block:
+        #     pre_block.append(f"tag @s add {self.func_name}_ended")
+
+
+
 
         # splitPoint = 0
         # nNow = 0
