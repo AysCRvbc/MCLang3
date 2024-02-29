@@ -165,8 +165,8 @@ class Parser(Prc.PrcParser):
 
             self.parser.parse_code(triggerBlock)
 
-        if not blocked:
-            cmds.insert(0, f"tag @s remove {self.func_name}_ended")
+        # if not blocked:
+        #     cmds.insert(0, f"tag @s remove {self.func_name}_ended")
 
         return {"type": "function", "data": cmds, "name": self.func_name, "selector": self.selector}
 

@@ -54,7 +54,7 @@ class Parser(Prc.PrcParser):
         func = ns.getFunction(func)
 
         res.append(f"tag @s add {func}_caller")
-        res.append(f"tag @s remove {func}_ended")
+        # res.append(f"tag @s remove {func}_ended")
         res.append(f"//block {func}_ended")
 
         for i, e in enumerate(res):

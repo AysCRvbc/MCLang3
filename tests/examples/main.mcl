@@ -13,6 +13,7 @@ input boolval(num) -> players
 
 func say() -> @a
     system.log(@s, ["Да, это четное число!"])
+    return 1
 
 input value(num) -> players #Блоки кода всё ещё тупо табуляцией
     y_d = num
