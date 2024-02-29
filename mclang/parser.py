@@ -18,12 +18,20 @@ class NeccessaryMeta:
         self.level = 0
         self.index = 0
 
+        self.curfunc = None
+
     def setNamespace(self, namespace_name):
         if self.namespace is not None:
             self.namespace = self.namespace.copy(namespace_name)
             return
         self.namespace = Namespace(namespace_name)
         return self.namespace
+
+    def setCurFunc(self, func):
+        self.curfunc = func
+
+    def getCurFunc(self):
+        return self.curfunc
 
     def setProcess(self, process):
         self.process = process

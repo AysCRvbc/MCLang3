@@ -39,20 +39,21 @@ class Parser(Prc.PrcParser):
     def __init__(self, ns: Namespace = None):
         self.selector = None
         self.ns = ns
-        self.n = 0
-        self.nNow = 0
         self.name = None
         self.added = []
         self.parser: parser.CodeParser = None
         self.ns = None
         self.func_name = None
         self.nmeta: parser.NeccessaryMeta = None
+        self.nBlock = 0
 
     def parse(self, block, meta, base=None, data=None):
         prc_list = []
         func_name, args = block.split("(", 1)
         self.name = func_name
         nmeta: parser.NeccessaryMeta = meta["NMETA"]
+        oldCurFunc = nmeta.getCurFunc()
+        nmeta.setCurFunc(self)
         prs: parser.CodeParser = meta["PARSER"]
         nmeta.setProcess(func_name)
 
@@ -87,6 +88,7 @@ class Parser(Prc.PrcParser):
         self.ns = nmeta.getNamespace()
         prcs = prs.parse_prcs("\n".join(prc_list) + "\n" + data)
         nmeta.namespace = old_ns
+        nmeta.setCurFunc(oldCurFunc)
 
         cmds = []
 
@@ -99,71 +101,92 @@ class Parser(Prc.PrcParser):
         )
 
         self.func_name = ns.getFunction(func_name)
+        cmds = self.preHandling(cmds, func_name)
         nmeta.addCompiled(self.getJson(cmds))
+
+    def newBlock(self):
+        self.nBlock += 1
+
+    def preHandling(self, cmds, waiter_name):
+        for i, e in enumerate(cmds):
+            if "//block" in e:
+                base, block = e.split("//block", 1)
+                waiter, block = block.split(" ", 1)
+                # cmds[i] = []
+                # cmds.append() # нужно добавить waiter и выйти из текущей функции
+
+        for i in cmds:
+            print(f"command in func -> {i}")
+        print()
+        return []
 
     def getJson(self, cmds, blocked = False) -> dict:
         pre_block = cmds
         post_block = []
         block = None
 
-        for i, cmd in enumerate(pre_block):
-            if "//block" in cmd:
-                block = cmd.split("//block")[1].strip()
-                post_block = cmds[i + 1:]
-                break
-
-        if not post_block:
-            pre_block.append(f"tag @s add {self.func_name}_ended")
-
-        cmds = pre_block
-
-        inserted = {}
-        for i, cmd in enumerate(cmds):
-            if "//block" in cmd:
-                name = self.func_name
-                if self.nNow > 0:
-                    name += f"_{self.nNow}"
-                self.nNow += 1
-                ccc = f"tag @s remove {name}"
-                base = cmds[i].split("//block")[0]
-                cmds[i] = base + ccc
-                inserted[i] = f"tag @s add {self.func_name}_waiter{self.nNow}"
-                inserted[i] = base + inserted[i]
-
-        added = 0
-        for i in inserted:
-            cmds.insert(i+added, inserted[i])
-            added += 1
-
-        if block:
-            self.n += 1
-            name = self.n
-            self.nNow -= 1
-            subFunc = self.getJson(post_block, blocked=True)
-            subCmds = subFunc["data"]
-            subFunc["name"] += f"_{name}"
-            subFunc["data"] = replaceGlobalToLocalExit(self.func_name, subFunc["name"], subCmds)
-            self.added.append(subFunc)
-
-            self.added[-1]["data"].insert(0,
-                f"tag @s remove {self.func_name}_waiter{name}")
-
-            self.nmeta.addCompiled(self.added[-1])
-
-            subfunc_name = self.added[-1]["name"].split("_", 1)[1]
-
-            self.ns.setFunction(subfunc_name, is_global=True)
-            self.ns.setFunctionField(subfunc_name, "prc", self)
-
-            triggerBlock = [
-                f"observe {self.func_name.split('_', 1)[1]}_{name} -> {self.selector}",
-                f"    select tag = {self.ns.prefixy(block.split('_', 1)[1], is_global=True)}",
-                f"    select tag = {self.func_name}_waiter{name}",
-                f"    delete {self.ns.prefixy(block.split('_', 1)[1], is_global=True)}",
-            ]
-            triggerBlock = "\n".join(triggerBlock)
-
-            self.parser.parse_code(triggerBlock)
+        # splitPoint = 0
+        # nNow = 0
+        #
+        # for i, cmd in enumerate(pre_block):
+        #     if "//block" in cmd:
+        #         nNow, block = cmd.split("//block")[1].strip().split(" ", 1)
+        #         nNow = int(nNow)
+        #         splitPoint = i + 1
+        #         break
+        #
+        # if not post_block:
+        #     pre_block.append(f"tag @s add {self.func_name}_ended")
+        #
+        # cmds = pre_block
+        #
+        # inserted = {}
+        # for i, cmd in enumerate(cmds):
+        #     if "//block" in cmd:
+        #         name = self.func_name
+        #         if nNow > 0:
+        #             name += f"_{self.nNow}"
+        #         self.nNow += 1
+        #         ccc = f"tag @s remove {name}"
+        #         base = cmds[i].split("//block")[0]
+        #         cmds[i] = base + ccc
+        #         inserted[i] = f"tag @s add {self.func_name}_waiter{self.nNow}"
+        #         inserted[i] = base + inserted[i]
+        #
+        # added = 0
+        # for i in inserted:
+        #     cmds.insert(i+added, inserted[i])
+        #     added += 1
+        #
+        # if block:
+        #     self.n += 1
+        #     name = self.n
+        #     self.nNow -= 1
+        #     subFunc = self.getJson(post_block, blocked=True)
+        #     subCmds = subFunc["data"]
+        #     subFunc["name"] += f"_{name}"
+        #     subFunc["data"] = replaceGlobalToLocalExit(self.func_name, subFunc["name"], subCmds)
+        #     self.added.append(subFunc)
+        #
+        #     self.added[-1]["data"].insert(0,
+        #         f"tag @s remove {self.func_name}_waiter{name}")
+        #
+        #     self.nmeta.addCompiled(self.added[-1])
+        #
+        #     subfunc_name = self.added[-1]["name"].split("_", 1)[1]
+        #
+        #     self.ns.setFunction(subfunc_name, is_global=True)
+        #     self.ns.setFunctionField(subfunc_name, "prc", self)
+        #
+        #     triggerBlock = [
+        #         f"observe {self.func_name.split('_', 1)[1]}_{name} -> {self.selector}",
+        #         f"    select tag = {self.ns.prefixy(block.split('_', 1)[1], is_global=True)}",
+        #         f"    select tag = {self.func_name}_waiter{name}",
+        #         f"    delete {self.ns.prefixy(block.split('_', 1)[1], is_global=True)}",
+        #     ]
+        #     triggerBlock = "\n".join(triggerBlock)
+        #
+        #     self.parser.parse_code(triggerBlock)
 
         # if not blocked:
         #     cmds.insert(0, f"tag @s remove {self.func_name}_ended")

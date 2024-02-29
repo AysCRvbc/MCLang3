@@ -51,11 +51,14 @@ class Parser(Prc.PrcParser):
         nmeta: pr.NeccessaryMeta = meta["NMETA"]
         ns: Namespace = nmeta.getNamespace()
         func = block.split("(", 1)[0]
-        func = ns.getFunction(func)
+        func = ns.getFunction(func, full=True)
+        prc = nmeta.curfunc
+        func = func['name']
 
         res.append(f"tag @s add {func}_caller")
         # res.append(f"tag @s remove {func}_ended")
-        res.append(f"//block {func}_ended")
+        prc.newBlock()
+        res.append(f"//block {prc.nBlock} {func}_ended")
 
         for i, e in enumerate(res):
             res[i] = {"type": "command", "value": e}
