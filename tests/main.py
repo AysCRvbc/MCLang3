@@ -11,7 +11,7 @@ pos = "6 -12 20"
 
 center = [int(i) for i in pos.split()]
 
-res = mcj.getBuilding(res, log=False, center=center)
+res = mcj.getBuilding(res, log=True, center=center)
 
 for big_cmd in res:
     print(big_cmd)

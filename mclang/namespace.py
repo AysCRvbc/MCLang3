@@ -82,6 +82,7 @@ class Namespace:
             prefix = self.global_name
         self.functions[name] = {}
         self.functions[name]['name'] = f'{prefix}_{name.replace(".", "_")}'
+        return self.functions[name]['name']
 
     def setFunctionField(self, name, key, val):
         self.functions[name][key] = val

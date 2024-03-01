@@ -45,7 +45,7 @@ def getComment(line):
     for c in line:
         if c == '"':
             if in_string:
-                return getComment(line[c_n+1:])
+                return getComment(line[c_n + 1:])
             in_string = not in_string
         elif c == "#":
             if not in_string:
@@ -64,6 +64,7 @@ class Parser(Prc.PrcParser):
         self.func_name = None
         self.nmeta: parser.NeccessaryMeta = None
         self.nBlock = 0
+        self.n = 0
 
     def parse(self, block, meta, base=None, data=None):
         prc_list = []
@@ -115,7 +116,8 @@ class Parser(Prc.PrcParser):
 
         caller_cmds = [f'tag @s add {ns.getFunction(func_name)}']
         nmeta.addCompiled(
-            {"type": "function", "data": caller_cmds, "name": ns.getFunction(func_name) + "_caller", "selector": self.selector}
+            {"type": "function", "data": caller_cmds, "name": ns.getFunction(func_name) + "_caller",
+             "selector": self.selector}
         )
 
         self.func_name = ns.getFunction(func_name)
@@ -133,108 +135,59 @@ class Parser(Prc.PrcParser):
                 block = e.split("#block")[1].strip()
                 waiter, blocker = block.split(" ", 1)
                 waiter = f"{waiter_name}_waiter{waiter}"
-                cmds[i] = {
-                    "waiter": waiter,
-                    "blocker": blocker,
-                    "base": base
-                }
+                cmds[i] = [
+                    f"{base}tag @s add {waiter}",
+                    f"{base}tag @s remove {self.func_name}",
+                    f"{base}#block {waiter} {blocker}"
+                ]
+        cmds = parser.recursive_array_unpack(cmds)
         return cmds
 
-    def getJson(self, cmds, blocked = False) -> dict:
-        pre_block = []
+    def getJson(self, cmds, blocked=False) -> dict:
         post_block = []
-        blocker = None
-        waiter = None
-        base = None
+        block = None
 
-        # for i, cmd in enumerate(cmds):
-        #     if isinstance(cmd, dict):
-        #         waiter = cmd['waiter']
-        #         blocker = cmd['blocker']
-        #         base = cmd['base']
-        #         pre_block = cmds[:i]
-        #         post_block = cmds[i+1:]
-        #         break
-        # else:
-        #     pre_block = cmds
-        #
-        # if post_block:
-        #     pre_block.append(base + f"tag @s add {waiter}")
-        #     pre_block.append(base + f"tag @s remove {self.func_name}")
-        #
-        # elif not post_block:
-        #     pre_block.append(f"tag @s add {self.func_name}_ended")
+        for i, e in enumerate(cmds):
+            if getComment(e):
+                post_block = cmds[i + 1:]
+                block = getComment(e)
+                break
 
+        if block:
+            self.n += 1
+            block = block.split(" ", 1)[1]
+            waiter, block = block.split(" ", 1)
+            subfunc_name = f"{self.func_name.split('_', 1)[1]}_{self.n}"
+            self.ns.setFunction(subfunc_name, is_global=True)
+            self.ns.setFunctionField(subfunc_name, "prc", self)
 
+            subFunc = self.getJson(post_block, blocked=True)
+            subCmds = subFunc["data"]
+            subFunc["name"] = self.ns.getFunction(subfunc_name)
+            subFunc["data"] = replaceGlobalToLocalExit(self.func_name, subFunc["name"], subCmds)
+            subFunc["data"].insert(0,
+                                   f"tag @s remove {waiter}")
+            self.nmeta.addCompiled(subFunc)
 
+            triggerBlock = [
+                f"observe {subfunc_name} -> {self.selector}",
+                f"    select tag = {block}",
+                f"    select tag = {waiter}",
+                f"    delete {block}",
+            ]
 
-        # splitPoint = 0
-        # nNow = 0
-        #
-        # for i, cmd in enumerate(pre_block):
-        #     if "//block" in cmd:
-        #         nNow, block = cmd.split("//block")[1].strip().split(" ", 1)
-        #         nNow = int(nNow)
-        #         splitPoint = i + 1
-        #         break
-        #
-        # if not post_block:
-        #     pre_block.append(f"tag @s add {self.func_name}_ended")
-        #
-        # cmds = pre_block
-        #
-        # inserted = {}
-        # for i, cmd in enumerate(cmds):
-        #     if "//block" in cmd:
-        #         name = self.func_name
-        #         if nNow > 0:
-        #             name += f"_{self.nNow}"
-        #         self.nNow += 1
-        #         ccc = f"tag @s remove {name}"
-        #         base = cmds[i].split("//block")[0]
-        #         cmds[i] = base + ccc
-        #         inserted[i] = f"tag @s add {self.func_name}_waiter{self.nNow}"
-        #         inserted[i] = base + inserted[i]
-        #
-        # added = 0
-        # for i in inserted:
-        #     cmds.insert(i+added, inserted[i])
-        #     added += 1
-        #
-        # if block:
-        #     self.n += 1
-        #     name = self.n
-        #     self.nNow -= 1
-        #     subFunc = self.getJson(post_block, blocked=True)
-        #     subCmds = subFunc["data"]
-        #     subFunc["name"] += f"_{name}"
-        #     subFunc["data"] = replaceGlobalToLocalExit(self.func_name, subFunc["name"], subCmds)
-        #     self.added.append(subFunc)
-        #
-        #     self.added[-1]["data"].insert(0,
-        #         f"tag @s remove {self.func_name}_waiter{name}")
-        #
-        #     self.nmeta.addCompiled(self.added[-1])
-        #
-        #     subfunc_name = self.added[-1]["name"].split("_", 1)[1]
-        #
-        #     self.ns.setFunction(subfunc_name, is_global=True)
-        #     self.ns.setFunctionField(subfunc_name, "prc", self)
-        #
-        #     triggerBlock = [
-        #         f"observe {self.func_name.split('_', 1)[1]}_{name} -> {self.selector}",
-        #         f"    select tag = {self.ns.prefixy(block.split('_', 1)[1], is_global=True)}",
-        #         f"    select tag = {self.func_name}_waiter{name}",
-        #         f"    delete {self.ns.prefixy(block.split('_', 1)[1], is_global=True)}",
-        #     ]
-        #     triggerBlock = "\n".join(triggerBlock)
-        #
-        #     self.parser.parse_code(triggerBlock)
+            triggerBlock = "\n".join(triggerBlock)
 
-        # if not blocked:
-        #     cmds.insert(0, f"tag @s remove {self.func_name}_ended")
+            self.parser.parse_code(triggerBlock)
+        else:
+            cmds.append(f"tag @s add {self.func_name}_ended")
 
-        return {"type": "function", "data": cmds, "name": self.func_name, "selector": self.selector}
+        cmds_block_deleted = []
+        for i in cmds:
+            if not getComment(i):
+                cmds_block_deleted.append(i)
+
+        return {"type": "function", "data": cmds_block_deleted, "name": self.func_name, "selector": self.selector}
 
 
 def replaceGlobalToLocalExit(process, local, cmds):
