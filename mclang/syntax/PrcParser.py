@@ -1,6 +1,5 @@
-from mclang.namespace import Namespace
-
 levels = {}
+
 
 class PrcParser:
     def process(self, block, meta, base=None, data=None):
@@ -19,3 +18,6 @@ class PrcParser:
 
     def parse(self, block, meta, base=None, data=None):
         pass
+
+    def getName(self):
+        raise Exception

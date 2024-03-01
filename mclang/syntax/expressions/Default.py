@@ -22,4 +22,4 @@ class Parser(Prc.PrcParser):
             if res:
                 handler = func()
                 return handler.parse(line, meta)
-        print(f"DEFAULT: {line}")
+        raise Exception("Syntax error in line: " + line)

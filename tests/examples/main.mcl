@@ -1,11 +1,14 @@
 @name cctest # указание имени
 @import is_even # импорты теперь вот такие вот
+@define expression tester
 
 var y_d # Теперь если кол-во параметров 2, то используется тип скора dummy
 var bool
 
 chat system = ["# CCTEST #"]
 selector players = @a # Новый тип данных
+
+testfor
 
 input boolval(num) -> players
     bool = num

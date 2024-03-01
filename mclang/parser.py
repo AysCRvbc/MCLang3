@@ -79,6 +79,7 @@ block_types = {
 line_types = {
     "@name": config,
     "@import": config,
+    "@define": config,
     "var": var,
     "chat": chat,
     "selector": selector,
