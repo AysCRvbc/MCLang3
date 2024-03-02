@@ -11,12 +11,17 @@ image lmao = "texture.png"
 
 func pargen_activate() -> stands
     execute data modify entity @s NoGravity set value 1b
+    execute data modify entity @s Invisible set value 1b
     self.pargen = True
 
 input activate(num) -> @a
     mod at @s
         spawn minecraft:armor_stand pargen_activate
 
+input clear(num) -> @a
+    mod as @e[type=armor_stand]
+        execute kill @s
+
 rule pgen(pargen) -> stands
     mod at @s
-        lmao.show(7, 5, 1)
+        lmao.show(1, 1, 0.3, 0.03)
