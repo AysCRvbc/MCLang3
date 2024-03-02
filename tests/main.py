@@ -7,7 +7,7 @@ parser = pr.CodeParser()
 
 res = parser.get_prcs(filename)
 
-pos = "6 -12 20"
+pos = "6 -60 20"
 
 center = [int(i) for i in pos.split()]
 

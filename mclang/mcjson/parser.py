@@ -37,7 +37,7 @@ def getBuilding(prcs: list, center=(0, 0, 0), log=False):
         btype = block['type']
 
         if btype == "function":
-            fblocks = btr.getCommandsBlocks(block['cmds'], *center, x_offset=x_offset, conditional=False)
+            fblocks = btr.getCommandsBlocks(block['cmds'], *center, x_offset=x_offset, conditional=False, max_y=10)
             res.extend(fblocks)
         elif btype == "command":
             if single_commands_x == -1:
@@ -73,7 +73,7 @@ def getBuilding(prcs: list, center=(0, 0, 0), log=False):
     return cmdUnifier(res)
 
 
-def cmdUnifier(cmd: list, lim=50):
+def cmdUnifier(cmd: list, lim=80):
     groups = []
     result = []
 

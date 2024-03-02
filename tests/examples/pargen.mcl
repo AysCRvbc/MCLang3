@@ -10,6 +10,7 @@ selector stands = @e[type=armor_stand]
 image lmao = "texture.png"
 
 func pargen_activate() -> stands
+    execute data modify entity @s NoGravity set value 1b
     self.pargen = True
 
 input activate(num) -> @a
