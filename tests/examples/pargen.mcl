@@ -1,0 +1,13 @@
+@name ptest
+@define expresstion particle_generator
+
+image lmao = "texture.png"
+
+input activate(num) -> @a
+    mod at @s
+        spawn minecraft:armor_stand
+            self.pargen = true
+
+rule pgen(pargen) -> minecraft:armor_stand
+    mod at @s
+        lmao.show()
