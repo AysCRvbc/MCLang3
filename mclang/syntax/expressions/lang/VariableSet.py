@@ -72,7 +72,7 @@ class Parser(Prc.PrcParser):
     def tag_const(self, variables: list, meta):
         tag = variables[0].split(".", 1)[1]
         tag = meta["NMETA"].getNamespace().prefixy(tag)
-        if variables[1] == "True":
+        if variables[1]:
             return [{"type": "command", "value": f"tag @s add {tag}"}]
         else:
             return [{"type": "command", "value": f"tag @s remove {tag}"}]

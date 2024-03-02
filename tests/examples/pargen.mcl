@@ -2,15 +2,20 @@
 
 @define expression particle_generator
 @define block mod_block
-@define block spawn_block
+@define expression spawn_generator
+@define block rule_block
+
+selector stands = @e[type=armor_stand]
 
 image lmao = "texture.png"
 
+func pargen_activate() -> stands
+    self.pargen = True
+
 input activate(num) -> @a
     mod at @s
-        spawn minecraft:armor_stand
-            self.pargen = true
+        spawn minecraft:armor_stand pargen_activate
 
-rule pgen(pargen) -> minecraft:armor_stand
+rule pgen(pargen) -> stands
     mod at @s
-        lmao.show()
+        lmao.show(7, 5, 1)

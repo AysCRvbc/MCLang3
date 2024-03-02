@@ -1,4 +1,5 @@
 import mclang.syntax.PrcParser as prc
+import mclang.parser as pr
 
 
 class Parser(prc.PrcParser):
@@ -6,7 +7,15 @@ class Parser(prc.PrcParser):
         return "mod"
 
     def parse(self, block, meta, base=None, data=None):
-        raise NotImplementedError()
+        parser: pr.CodeParser = meta["PARSER"]
+        base = block
+        base = "execute " + base
+        base = base.strip()
+        base = base + " run "
 
-    def show(self, args: list, meta):
-        raise NotImplementedError()
+        prc_list = parser.parse_prcs(data)
+        cmds = []
+        for prcl in prc_list:
+            prcl['value'] = base + prcl['value']
+
+        return prc_list
