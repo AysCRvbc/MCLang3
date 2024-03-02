@@ -1,5 +1,8 @@
 @name ptest
-@define expresstion particle_generator
+
+@define expression particle_generator
+@define block mod_block
+@define block spawn_block
 
 image lmao = "texture.png"
 
