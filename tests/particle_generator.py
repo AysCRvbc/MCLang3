@@ -23,6 +23,8 @@ def getImageData(sx, sy, block_size, image_path):
                 scaled_x = round(scaled_x, 5)
                 scaled_y = 1 - round(scaled_y, 5)
 
+                scaled_x -= sx/2
+
                 rgb = [round(c / 255.0, 5) for c in pixel[:3]]
 
                 data.append((scaled_x, scaled_y, rgb))
@@ -43,9 +45,12 @@ class Parser(prc.PrcParser):
         sy = float(args[1])
         size = float(args[2])
         psize = float(args[3])
+        selector = "@a"
+        if len(args) > 4:
+            selector = args[4]
         data = getImageData(sx, sy, psize, self.imagePath)
         for dat in data:
-            cmds.append(f"particle minecraft:dust {dat[2][0]} {dat[2][1]} {dat[2][2]} {size} ~{dat[0]} ~{dat[1]} ~")
+            cmds.append(f"particle minecraft:dust {dat[2][0]} {dat[2][1]} {dat[2][2]} {size} ^{dat[0]} ^{dat[1]} ^ 0 0 0 0 1 force {selector}")
         res = []
         for cmd in cmds:
             res.append({

@@ -16,7 +16,7 @@ def json_repr_len(dct: dict):
     return len(str(dct))
 
 
-def getBuilding(prcs: list, center=(0, 0, 0), log=False):
+def getBuilding(prcs: list, center=(0, 0, 0), log=False, max_cmd=80):
     if log:
         k = prcs.copy()
         k.sort(key=json_repr_len, reverse=True)
@@ -37,7 +37,7 @@ def getBuilding(prcs: list, center=(0, 0, 0), log=False):
         btype = block['type']
 
         if btype == "function":
-            fblocks = btr.getCommandsBlocks(block['cmds'], *center, x_offset=x_offset, conditional=False, max_y=10)
+            fblocks = btr.getCommandsBlocks(block['cmds'], *center, x_offset=x_offset, conditional=False, max_y=80)
             res.extend(fblocks)
         elif btype == "command":
             if single_commands_x == -1:
@@ -70,10 +70,10 @@ def getBuilding(prcs: list, center=(0, 0, 0), log=False):
 
     res = dep_sort(res)
 
-    return cmdUnifier(res)
+    return cmdUnifier(res, lim=max_cmd)
 
 
-def cmdUnifier(cmd: list, lim=80):
+def cmdUnifier(cmd: list, lim=70):
     groups = []
     result = []
 

@@ -1,4 +1,4 @@
-@name ptest
+@name nextbot
 
 @define expression particle_generator
 @define block mod_block
@@ -7,7 +7,7 @@
 
 selector stands = @e[type=armor_stand]
 
-image lmao = "grush.jpg"
+image lmao = "texture.jpg"
 
 func pargen_activate() -> stands
     execute data modify entity @s NoGravity set value 1b

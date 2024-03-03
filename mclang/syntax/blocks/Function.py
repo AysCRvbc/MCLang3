@@ -194,4 +194,7 @@ def replaceGlobalToLocalExit(process, local, cmds):
     for i, e in enumerate(cmds):
         if e.endswith(f"tag @s remove {process}"):
             cmds[i] = e.replace(f"tag @s remove {process}", f"tag @s remove {local}")
+        if e == f"tag @s remove {local}":
+            cmds = cmds[:i]
+            break
     return cmds
