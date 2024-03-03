@@ -54,13 +54,13 @@ intA = [psfloat(x) for x in a]
 intB = [psfloat(x) for x in b]
 
 dx = intB[0] - intA[0]
-dy = intB[1] - intA[1]
+dz = intB[1] - intA[1]
 
-r = psatan(frac(dy, dx))
+r = psatan(frac(dz, dx))
 
-mlr = mul(200, r)
-frc = frac(mlr, pi)
-frc -= 100
-val = mul(frc, 9000)
+res = mul(200, r)
+res = frac(res, 314)
+res -= 100
+res = mul(res, 9000)
 
-print(val)
+print(res)

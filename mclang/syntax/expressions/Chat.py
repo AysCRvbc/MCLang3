@@ -69,11 +69,7 @@ class Parser(Prc.PrcParser):
         for m in msg:
             msgs.append(self.replaceValue(m))
             if not (isinstance(msgs[-1], str)):
-                if msgs[-1]['type'] == "scoreboard":
-                    msgs[-1] = msgs[-1]['value']
-                else:
-                    print(msgs[-1])
-                    raise ValueError("Type not supported")
+                msgs[-1] = msgs[-1]['value']
 
         res = []
         for m in msgs:

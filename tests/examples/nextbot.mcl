@@ -4,10 +4,45 @@
 @define block mod_block
 @define expression spawn_generator
 @define block rule_block
+@define expression nbt_expression
+#@define block float_block
+@define block template_block
+
+#nbt rot = Rotation[0]
+#float player_x
+#float player_z
+#float dx
+#float dz
+#float angle
+#
+#template basedAngle
+#    angle.frac(dx)
+#    angle.atan()
+#    angle.mul(2)
+#    angle.frac(3.14)
+#    angle.sub(1)
+#    angle.mul(90)
+#
+#template updateAngle
+#    player_x.setFromNbt(Pos[0], @p)
+#    player_z.setFromNbt(Pos[2], @p)
+#    dx.setFromNbt(Pos[0])
+#    dz.setFromNbt(Pos[2])
+#
+#    dx.sub(player_x)
+#    dz.sub(player_z)
+#
+#    angle.set(dz)
+#    basedAngle.insert()
+#    rot.storeFloat(angle)
+
+
 
 selector stands = @e[type=armor_stand]
 
-image lmao = "texture.jpg"
+image lmao = "texture.png"
+
+chat system = ["<Гигачад> "]
 
 func pargen_activate() -> stands
     execute data modify entity @s NoGravity set value 1b
@@ -23,5 +58,10 @@ input clear(num) -> @a
         execute kill @s
 
 rule pgen(pargen) -> stands
+    mod at @s facing entity @p[distance=..10] eyes
+        execute tp ^ ^ ^0.2
+        mod as @p[distance=..2]
+            system.log(@s, ["Как же ты слаб!"])
+            execute kill @s
     mod at @s
-        lmao.show(1, 1, 0.3, 0.05)
+        lmao.show(2, 2, 0.3, 0.05)

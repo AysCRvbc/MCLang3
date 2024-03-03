@@ -6,7 +6,7 @@ from mclang.namespace import Namespace
 
 def getNumName(operation):
     operations_mapping = {"+": "plus", "-": "sub", "*": "mul", "/": "div", "%": "mod",
-                          ">": "gt", "<": "lt", ">~": "gte", "<~": "lte", "~": "eq"}
+                          ">": "gt", "<": "lt", ">~": "gte", "<~": "lte", "~": "eq", "-~": "usub"}
 
     sub_name = operations_mapping.get(operation)
     if sub_name is None:
@@ -16,7 +16,7 @@ def getNumName(operation):
 
 
 def parse_string(input_string):
-    pattern = re.compile(r'(?P<arg1>\b\w+(?:\.\w+)*)\s*(?P<operator>\+|-|/|\*|%|>|<|>~|<~|~)=\s*(?P<arg2>\b\w+(?:\.\w+)*|\d+)\b')
+    pattern = re.compile(r'(?P<arg1>\b\w+(?:\.\w+)*)\s*(?P<operator>\+|-|/|\*|%|>|<|>~|<~|~|-~)=\s*(?P<arg2>-?\b\w+(?:\.\w+)*|\d+)\b')
 
     match = pattern.match(input_string)
 
@@ -42,7 +42,7 @@ class Parser(Prc.PrcParser):
         operation = parsed[2]
         setter: str = parsed[3]
 
-        if setter.isnumeric():
+        if setter.lstrip("-").isnumeric():
             sub_name = getNumName(operation)
             res.append(f"{sub_name} = {setter}")
             setter = ns.setValue(sub_name, "scoreboard", meta="dummy")['value']
@@ -65,6 +65,12 @@ class Parser(Prc.PrcParser):
             res.append(f"execute execute if score @s {getter} {operation} @s {setter} run scoreboard players set @s {tempvar} 1")
             res.append(f"execute execute unless score @s {getter} {operation} @s {setter} run scoreboard players set @s {tempvar} 0")
             res.append(f"execute scoreboard players operation @s {getter} = @s {tempvar}")
+        elif operation == "-~":
+            tempvap = "unmntmp"
+            setter_temp = ns.setValue(tempvap, "scoreboard", meta="dummy")['value']
+            res.append(f"execute scoreboard players set @s {setter_temp} -1")
+            res.append(f"execute scoreboard players operation @s {setter} *= @s {setter_temp}")
+            res.append(f"execute scoreboard players operation @s {getter} = @s {setter}")
         else:
             res.append(f"execute scoreboard players operation @s {getter} {operation}= @s {setter}")
 

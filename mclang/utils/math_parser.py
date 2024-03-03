@@ -25,6 +25,7 @@ def get_operator_symbol(op):
         'Gt': '>',
         'GtE': '>~',
         'Eq': '~',
+        'USub': '-~',
     }
     return operator_mapping[op]
 
@@ -53,6 +54,7 @@ def get_math_cmds(expression, meta):
     def generate_temp_var():
         global temp_counter
         temp_var = f'temp_{temp_counter}'
+        meta["NMETA"].getNamespace().setValue(temp_var, "scoreboard", meta="dummy")
         temp_counter += 1
         return temp_var
 
@@ -76,7 +78,7 @@ def get_math_cmds(expression, meta):
             op = get_operator_symbol(expr.op.__class__.__name__)
 
             temp_var = generate_temp_var()
-            final_result.append(f"{temp_var} = {op}{operand}")
+            final_result.append(f"{temp_var} {op}= {operand}")
 
             return temp_var
 
@@ -112,7 +114,6 @@ def get_math_cmds(expression, meta):
             ns.getValue(f"{name}_retval")["value"] = funcns.getValue("retval")["value"]
 
             return f"{name}_retval"
-
         elif isinstance(expr, ast.Expr):
             return transform_expression(expr.value)
         elif isinstance(expr, ast.Name):
