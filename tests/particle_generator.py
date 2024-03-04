@@ -6,7 +6,8 @@ from PIL import Image
 
 def getImageData(sx, sy, block_size, image_path):
     with Image.open(image_path) as img:
-        img = img.resize((int(sx/block_size), int(sy/block_size)))
+        img = img.resize((int(sx / block_size), int(sy / block_size)))
+        img = img.convert("RGBA")
 
         data = []
 
@@ -23,8 +24,8 @@ def getImageData(sx, sy, block_size, image_path):
                 scaled_x = round(scaled_x, 5)
                 scaled_y = 1 - round(scaled_y, 5)
 
-                scaled_x -= sx/2
-                scaled_y += sy/2
+                scaled_x -= sx / 2
+                scaled_y += sy / 2
 
                 rgb = [round(c / 255.0, 5) for c in pixel[:3]]
 
@@ -51,7 +52,8 @@ class Parser(prc.PrcParser):
             selector = args[4]
         data = getImageData(sx, sy, psize, self.imagePath)
         for dat in data:
-            cmds.append(f"particle minecraft:dust {dat[2][0]} {dat[2][1]} {dat[2][2]} {size} ^{dat[0]} ^{dat[1]} ^ 0 0 0 0 1 force {selector}")
+            cmds.append(
+                f"particle minecraft:dust {dat[2][0]} {dat[2][1]} {dat[2][2]} {size} ^{dat[0]} ^{dat[1]} ^ 0 0 0 0 1 force {selector}")
         res = []
         for cmd in cmds:
             res.append({
@@ -65,6 +67,6 @@ class Parser(prc.PrcParser):
         ns: Namespace = nmeta.getNamespace()
         varname, path = [x.strip() for x in block.split("=")]
         self.imagePath = eval(path)
-        
+
         ns.setValue(varname, "image")
         ns.getValue(varname)["pointer"] = self

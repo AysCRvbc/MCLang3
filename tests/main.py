@@ -7,11 +7,11 @@ parser = pr.CodeParser()
 
 res = parser.get_prcs(filename)
 
-pos = "6 -60 20"
+pos = "197 -5 354"
 
 center = [int(i) for i in pos.split()]
 
-res = mcj.getBuilding(res, log=True, center=center, max_cmd=75)
+res = mcj.getBuilding(res, log=True, center=center, max_cmd=65)
 
 i = 1
 print()
@@ -20,8 +20,9 @@ for big_cmd in res:
     print()
     l = len(big_cmd)
     print(l)
-    if l > 32768:
+    if l > 32500:
         print("too long!")
         raise ValueError
+    input()
     print()
     i += 1

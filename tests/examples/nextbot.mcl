@@ -16,15 +16,18 @@ float axis1
 selector stands = @e[type=armor_stand]
 
 image lmao = "rock.png"
+image lmao2 = "rock2.png"
+image lmao3 = "rock3.jpg"
 
 chat system = ["<Скала> "]
 
 func pargen_activate() -> stands
-    execute data modify entity @s NoGravity set value 1b
-    execute data modify entity @s Invisible set value 1b
-    execute tp ~ -60 ~
-    zero.set(0)
-    self.pargen = True
+    mod at @s
+        execute data modify entity @s NoGravity set value 1b
+        execute data modify entity @s Invisible set value 1b
+        execute tp ~10 ~10 ~10
+        zero.set(0)
+        self.pargen = True
 
 input activate(num) -> @a
     mod at @s
@@ -35,27 +38,28 @@ input clear(num) -> @a
         execute kill @s
 
 rule pgen(pargen) -> stands
-    mod at @s facing entity @p[distance=..40] eyes # получаю угол между игроком и ботом
-        execute tp ^ ^ ^0.1 # нужно чтобы угол поменялся под нужный перед записью
-        axis0.setFromNbt(rot_axis0)
-        axis1.setFromNbt(rot_axis1)
-        execute tp ^ ^ ^-0.1 # возвращаю
-
-    mod at @s rotated as @s
-        mod if block ~ ~ ~ minecraft:air # если не в воздухе
-            rot_axis0.storeFloat(axis0)
-            rot_axis1.storeFloat(axis1) # я хочу чтобы только одна ось поворота менялась
-            execute tp ^ ^ ^0.3
-        mod unless block ~ ~ ~ minecraft:air
-            execute tp ~ ~0.5 ~
-
-    mod at @s as @p[distance=..2] # убиваю игрока если он слишком близко
-        system.log(@s, ["Дружище, ты слаб!"])
-        execute kill @s
-
-
     mod at @s
-        lmao.show(3, 3, 0.35, 0.045) # отображает картинку из переменной lmao
-        # первые две переменные - размер в блоках
-        # третья - размер частиц
-        # четвертая - частота дискретизации частиц
+        mod as @p[distance=..2] # убиваю игрока если он слишком близко
+            system.log(@s, ["Дружище, ты слаб!"])
+            execute kill @s
+
+        mod facing entity @p[distance=..20] eyes # получаю угол между игроком и ботом
+            execute tp ^ ^ ^0.1 # нужно чтобы угол поменялся под нужный перед записью
+            axis0.setFromNbt(rot_axis0)
+            axis1.setFromNbt(rot_axis1)
+            execute tp ^ ^ ^-0.1 # возвращаю
+
+        mod if entity @p[distance=..20]
+            mod if block ~ ~ ~ minecraft:air # если не в воздухе
+                rot_axis0.storeFloat(axis0)
+                rot_axis1.storeFloat(axis1) # я хочу чтобы только одна ось поворота менялась
+                execute tp ^ ^ ^0.3
+            mod unless block ~ ~ ~ minecraft:air
+                execute tp ~ ~0.5 ~
+            mod at @s
+                mod if entity @p[distance=..5]
+                    lmao3.show(2, 2, 0.4, 0.07)
+                    return
+                lmao.show(2, 2, 0.4, 0.07)
+            return
+        lmao2.show(2, 2, 0.4, 0.07)
