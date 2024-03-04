@@ -5,48 +5,25 @@
 @define expression spawn_generator
 @define block rule_block
 @define expression nbt_expression
-#@define block float_block
-@define block template_block
+@define block float_block
 
-#nbt rot = Rotation[0]
-#float player_x
-#float player_z
-#float dx
-#float dz
-#float angle
-#
-#template basedAngle
-#    angle.frac(dx)
-#    angle.atan()
-#    angle.mul(2)
-#    angle.frac(3.14)
-#    angle.sub(1)
-#    angle.mul(90)
-#
-#template updateAngle
-#    player_x.setFromNbt(Pos[0], @p)
-#    player_z.setFromNbt(Pos[2], @p)
-#    dx.setFromNbt(Pos[0])
-#    dz.setFromNbt(Pos[2])
-#
-#    dx.sub(player_x)
-#    dz.sub(player_z)
-#
-#    angle.set(dz)
-#    basedAngle.insert()
-#    rot.storeFloat(angle)
-
-
+nbt rot_axis0 = Rotation[0]
+nbt rot_axis1 = Rotation[1]
+float zero
+float axis0
+float axis1
 
 selector stands = @e[type=armor_stand]
 
-image lmao = "texture.png"
+image lmao = "rock.png"
 
-chat system = ["<Гигачад> "]
+chat system = ["<Скала> "]
 
 func pargen_activate() -> stands
     execute data modify entity @s NoGravity set value 1b
     execute data modify entity @s Invisible set value 1b
+    execute tp ~ -60 ~
+    zero.set(0)
     self.pargen = True
 
 input activate(num) -> @a
@@ -58,10 +35,27 @@ input clear(num) -> @a
         execute kill @s
 
 rule pgen(pargen) -> stands
-    mod at @s facing entity @p[distance=..10] eyes
-        execute tp ^ ^ ^0.2
-        mod as @p[distance=..2]
-            system.log(@s, ["Как же ты слаб!"])
-            execute kill @s
+    mod at @s facing entity @p[distance=..40] eyes # получаю угол между игроком и ботом
+        execute tp ^ ^ ^0.1 # нужно чтобы угол поменялся под нужный перед записью
+        axis0.setFromNbt(rot_axis0)
+        axis1.setFromNbt(rot_axis1)
+        execute tp ^ ^ ^-0.1 # возвращаю
+
+    mod at @s rotated as @s
+        mod if block ~ ~ ~ minecraft:air # если не в воздухе
+            rot_axis0.storeFloat(axis0)
+            rot_axis1.storeFloat(axis1) # я хочу чтобы только одна ось поворота менялась
+            execute tp ^ ^ ^0.3
+        mod unless block ~ ~ ~ minecraft:air
+            execute tp ~ ~0.5 ~
+
+    mod at @s as @p[distance=..2] # убиваю игрока если он слишком близко
+        system.log(@s, ["Дружище, ты слаб!"])
+        execute kill @s
+
+
     mod at @s
-        lmao.show(2, 2, 0.3, 0.05)
+        lmao.show(3, 3, 0.35, 0.045) # отображает картинку из переменной lmao
+        # первые две переменные - размер в блоках
+        # третья - размер частиц
+        # четвертая - частота дискретизации частиц

@@ -76,7 +76,7 @@ class Parser(Prc.PrcParser):
             if string_check(m):
                 res.append({"text": m[1:-1]})
             else:
-                res.append({"score": {"name": selector, "objective": m}})
+                res.append({"score": {"name": "@s", "objective": m}})
         arg = str(res).replace("'", '"')
 
         cmd = f"tellraw {selector} {arg}"

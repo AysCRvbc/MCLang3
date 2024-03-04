@@ -24,6 +24,7 @@ def getImageData(sx, sy, block_size, image_path):
                 scaled_y = 1 - round(scaled_y, 5)
 
                 scaled_x -= sx/2
+                scaled_y += sy/2
 
                 rgb = [round(c / 255.0, 5) for c in pixel[:3]]
 
