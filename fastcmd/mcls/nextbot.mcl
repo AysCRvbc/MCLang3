@@ -19,13 +19,14 @@ float health
 
 selector stands = @e[type=armor_stand]
 
-image lmao = "./mcls/assets/rock.png"
+image lmao1 = "./mcls/assets/rock.png"
 image lmao2 = "./mcls/assets/rock2.png"
 image lmao3 = "./mcls/assets/rock3.jpg"
 
 tellrope menu = "./mcls/assets/nextbot_menu.html"
 
-chat system = ["<Скала> "]
+chat rock = ["<Скала> "]
+chat system = ["NEXTBOTMOD: "]
 
 func pargen_activate() -> stands
     mod at @s
@@ -44,37 +45,53 @@ input clear(num) -> @a
         execute kill @s
 
 input menu(num) -> @a
-    menu.show()
+    menu.show(@s)
 
 rule pgen(pargen) -> stands
     mod at @s
-        mod facing entity @p[distance=..20] eyes # получаю угол между игроком и ботом
-            execute tp ^ ^ ^0.1 # нужно чтобы угол поменялся под нужный перед записью
+        # Расчет угла поворота к игроку
+        mod facing entity @p[distance=..20] eyes
+            execute tp ^ ^ ^0.1
             axis0.setFromNbt(rot_axis0)
             axis1.setFromNbt(rot_axis1)
-            execute tp ^ ^ ^-0.1 # возвращаю
+            execute tp ^ ^ ^-0.1
 
+        # Логика поведения
+        sprite = 2
+        dealDamage = False
         mod if entity @p[distance=..20]
             health.setFromNbt(target_health, @p)
-            system.log(@p, [health])
+            mod if entity @p[distance=..2]
+                dealDamage = True
             if health < 500
-                return
+                dealDamage = False
+            canMove = False
+            mod if block ~ ~ ~ minecraft:air
+                canMove = True
 
-            mod if block ~ ~ ~ minecraft:air # если не в воздухе
+            if canMove
                 rot_axis0.storeFloat(axis0)
-                rot_axis1.storeFloat(axis1) # я хочу чтобы только одна ось поворота менялась
+                rot_axis1.storeFloat(axis1)
+                execute tp ^ ^ ^0.3
+            else
                 execute tp ^ ^ ^0.3
 
-            mod unless block ~ ~ ~ minecraft:air
-                execute tp ~ ~0.5 ~
+            player5blocks = 0
+            mod if entity @p[distance=..5]
+                player5blocks = 1
 
-            mod as @p[distance=..2]
+            if player5blocks == 0
+                sprite = 1
+            else
+                sprite = 3
+
+        if sprite == 1
+            lmao1.show(2, 2, 0.4, 0.07)
+        if sprite == 2
+            lmao2.show(2, 2, 0.4, 0.07)
+        if sprite == 3
+            lmao3.show(2, 2, 0.4, 0.07)
+
+        if dealDamage == True
+            mod as @p
                 execute damage @s 3 minecraft:indirect_magic
-
-            mod at @s
-                mod if entity @p[distance=..5]
-                    lmao3.show(2, 2, 0.4, 0.07)
-                    return
-                lmao.show(2, 2, 0.4, 0.07)
-            return
-        lmao2.show(2, 2, 0.4, 0.07)

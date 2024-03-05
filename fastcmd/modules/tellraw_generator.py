@@ -1,6 +1,7 @@
 import mclang.syntax.PrcParser as prc
 import mclang.parser as pr
 from mclang.namespace import Namespace
+import mclang.syntax.expressions.Selector as sct
 
 
 def getElements(input_string):
@@ -35,7 +36,7 @@ def getElements(input_string):
     replaces = []
     for i, e in enumerate(elements):
         if e == "<br>":
-            replaces.append({i: "\n"})
+            replaces.append({i: "\\n"})
         stripped = e.strip()
         if e != stripped:
             replaces.append({i: stripped})
@@ -56,7 +57,10 @@ def elements_to_json(elements):
             tag = i[1:-1]
             if tag[0] == "/":
                 tag = tag[1:]
-                base.pop(tag)
+                if tag == "color":
+                    base['color'] = "white"
+                else:
+                    base.pop(tag)
             else:
                 tag_base = tag.split()[0]
                 if tag_base == "color":
@@ -102,4 +106,17 @@ class Parser(prc.PrcParser):
         ns.getValue(varname)["pointer"] = self
 
     def show(self, args, meta):
-        raise NotImplemented
+        selector = args[0]
+        selector = sct.getSelector(selector, meta)
+
+        with open(self.templatePath, "r", encoding="utf-8") as f:
+            text = f.read()
+            elements = getElements(text)
+            json = elements_to_json(elements)
+
+        json = str(json).replace("'", '"')
+
+        cmd = f"tellraw {selector} {json}"
+        res = {"type": "command", "value": cmd}
+
+        return [res]

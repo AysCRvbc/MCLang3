@@ -119,6 +119,9 @@ def get_math_cmds(expression, meta):
         elif isinstance(expr, ast.Name):
             return expr.id
         elif isinstance(expr, ast.Constant):
+            ns: Namespace = meta["NMETA"].getNamespace()
+            if str(expr.value) in ns.variables:
+                expr.value = ns.getValue(str(expr.value))['value']
             return expr.value
         else:
             raise ValueError(f"Unsupported expression type: {expr.__class__.__name__}")

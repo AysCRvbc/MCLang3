@@ -6,7 +6,7 @@ filename = "./mcls/nextbot.mcl"
 parser = pr.CodeParser()
 
 res = parser.get_prcs(filename)
-pos = "-15 -10 24"
+pos = "12 -55 14"
 center = [int(i) for i in pos.split()]
 res = mcj.getAllCommandBlocks(res, log=False, center=center)
 
