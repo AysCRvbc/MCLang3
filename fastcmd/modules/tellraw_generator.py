@@ -1,32 +1,6 @@
-# /tellraw @s ["",
-# {"text":"Nextbot menu","bold":true,"color":"red"},
-# {"text":"\n"},
-# {"text":"Summon bot","underlined":true,
-#   "clickEvent":
-#       {"action":"run_command","value":"/trigger nextbot_input_activate"},
-#   "hoverEvent":
-#       {"action":"show_text","contents":"Summons DWAYNE ROCK"}},
-# {"text":"\n\n"},
-# {"text":"Kill all bots","underlined":true,
-#   "clickEvent":
-#       {"action":"run_command","value":"/trigger nextbot_input_clear"},
-#   "hoverEvent":
-#   {"action":"show_text","contents":"Command kills every living bot"}}]
-#
-#
-# <color red><bold> Nextbot menu </bold> </color>
-# <br>
-# <underlined>
-# <hover:show_text:Summons DWAYNE ROCK>
-# <click:run_command:/trigger nextbot_input_activate>Summon bot</click>
-# </hover>
-# <br> <br>
-# <hover:show_text:Command kills every living bot>
-# <click:run_command:/trigger nextbot_input_clear>Kill all bots</click>
-# </hover>
-# </underlined>
-
-import json
+import mclang.syntax.PrcParser as prc
+import mclang.parser as pr
+from mclang.namespace import Namespace
 
 
 def getElements(input_string):
@@ -43,7 +17,7 @@ def getElements(input_string):
         if start_tag:
             if c == ">" and prev != "\\":
                 start_tag = False
-                elements.append(input_string[tag_start:i+1])
+                elements.append(input_string[tag_start:i + 1])
         else:
             if c == "<" and prev != "\\":
                 current = current.strip()
@@ -99,7 +73,8 @@ def elements_to_json(elements):
                 elif tag_base == "obfuscated":
                     base["obfuscated"] = True
                 elif tag_base == "hoverEvent":
-                    base["hoverEvent"] = {"action": tag.split(" ", 2)[1].strip(), "contents": tag.split(" ", 2)[2].strip()}
+                    base["hoverEvent"] = {"action": tag.split(" ", 2)[1].strip(),
+                                          "contents": tag.split(" ", 2)[2].strip()}
                 elif tag_base == "clickEvent":
                     base["clickEvent"] = {"action": tag.split(" ", 2)[1].strip(), "value": tag.split(" ", 2)[2].strip()}
         else:
@@ -110,16 +85,20 @@ def elements_to_json(elements):
     return result
 
 
-input_string = """<color red><bold> Nextbot menu </bold> </color>
-<br> <underlined>
-<hoverEvent show_text Summons DWAYNE ROCK>
-<clickEvent run_command /trigger nextbot_input_activate>Summon bot</clickEvent> </hoverEvent>
-<br> <br>
-<hoverEvent show_text Command kills every living bot"> <clickEvent run_command /trigger nextbot_input_clear)>Kill all bots</clickEvent>
-</hoverEvent>
-</underlined>
-"""
+class Parser(prc.PrcParser):
+    def __init__(self):
+        self.templatePath = None
 
-elements = getElements(input_string)
-print(elements_to_json(elements))
+    def getName(self):
+        return "tellrope"
 
+    def parse(self, block, meta, base=None, data=None):
+        nmeta: pr.NeccessaryMeta = meta["NMETA"]
+        ns: Namespace = nmeta.getNamespace()
+        varname, path = [x.strip() for x in block.split("=")]
+        self.templatePath = eval(path)
+
+        ns.setValue(varname, "tellrope")
+        ns.getValue(varname)["pointer"] = self
+    
+    

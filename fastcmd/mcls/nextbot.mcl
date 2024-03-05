@@ -17,9 +17,11 @@ float health
 
 selector stands = @e[type=armor_stand]
 
-image lmao = "./mcls/images/rock.png"
-image lmao2 = "./mcls/images/rock2.png"
-image lmao3 = "./mcls/images/rock3.jpg"
+image lmao = "./mcls/assets/rock.png"
+image lmao2 = "./mcls/assets/rock2.png"
+image lmao3 = "./mcls/assets/rock3.jpg"
+
+tellrope menu = "./mcls/assets/nextbot_menu.html"
 
 chat system = ["<Скала> "]
 
@@ -38,6 +40,9 @@ input activate(num) -> @a
 input clear(num) -> @a
     mod as @e[type=armor_stand]
         execute kill @s
+
+input menu(num) -> @a
+    menu.show()
 
 rule pgen(pargen) -> stands
     mod at @s
