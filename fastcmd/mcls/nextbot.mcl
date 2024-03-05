@@ -6,6 +6,8 @@
 @define block modules.rule_block
 @define expression modules.nbt_expression
 @define block modules.float_block
+@define expression modules.tellraw_generator
+
 
 nbt rot_axis0 = Rotation[0]
 nbt rot_axis1 = Rotation[1]

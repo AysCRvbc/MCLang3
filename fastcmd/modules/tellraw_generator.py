@@ -100,5 +100,6 @@ class Parser(prc.PrcParser):
 
         ns.setValue(varname, "tellrope")
         ns.getValue(varname)["pointer"] = self
-    
-    
+
+    def show(self, args, meta):
+        raise NotImplemented
