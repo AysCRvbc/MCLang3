@@ -51,7 +51,7 @@ class Parser(Prc.PrcParser):
         defType, path = args.split(" ", 1)
         match defType:
             case "block":
-                module = __import__(path).Parser
+                module = __import__(path, fromlist=['']).Parser
                 if not issubclass(module, Prc.PrcParser):
                     raise Exception(f"Module {path} must inherit PrcParser")
                 name = module().getName()
@@ -61,7 +61,7 @@ class Parser(Prc.PrcParser):
                     raise Exception(f"Block {name} already exists")
                 parser.block_types[name] = module
             case "expression":
-                module = __import__(path).Parser
+                module = __import__(path, fromlist=['']).Parser
                 if not issubclass(module, Prc.PrcParser):
                     raise Exception(f"Module {path} must inherit PrcParser")
                 name = module().getName()

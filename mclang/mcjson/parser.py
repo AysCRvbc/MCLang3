@@ -15,8 +15,7 @@ def dep_sort(strings):
 def json_repr_len(dct: dict):
     return len(str(dct))
 
-
-def getBuilding(prcs: list, center=(0, 0, 0), log=False, max_cmd=80):
+def getAllCommandBlocks(prcs: list, center, log=False):
     if log:
         k = prcs.copy()
         k.sort(key=json_repr_len, reverse=True)
@@ -69,6 +68,12 @@ def getBuilding(prcs: list, center=(0, 0, 0), log=False, max_cmd=80):
     res.extend(deleteBlocks)
 
     res = dep_sort(res)
+
+    return res
+
+
+def getBuilding(prcs: list, center=(0, 0, 0), log=False, max_cmd=80):
+    res = getAllCommandBlocks(prcs, center=center, log=log)
 
     return cmdUnifier(res, lim=max_cmd)
 
