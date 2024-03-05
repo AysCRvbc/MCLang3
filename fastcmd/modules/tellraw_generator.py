@@ -78,7 +78,6 @@ def elements_to_json(elements):
     base = {}
 
     for i in elements:
-        i: str
         if i.startswith("<"):
             tag = i[1:-1]
             if tag[0] == "/":
@@ -108,7 +107,7 @@ def elements_to_json(elements):
             res["text"] = i
             result.append(res)
 
-        return result
+    return result
 
 
 input_string = """<color red><bold> Nextbot menu </bold> </color>
