@@ -61,7 +61,7 @@ rule pgen(pargen) -> stands
             mod unless block ~ ~ ~ minecraft:air
                 execute tp ~ ~0.5 ~
 
-            mod as @p[distance=..2] # убиваю игрока если он слишком близко
+            mod as @p[distance=..2]
                 execute damage @s 3 minecraft:indirect_magic
 
             mod at @s
