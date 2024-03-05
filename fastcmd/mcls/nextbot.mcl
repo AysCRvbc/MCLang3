@@ -6,6 +6,7 @@
 @define block modules.rule_block
 @define expression modules.nbt_expression
 @define block modules.float_block
+@define expression modules.pass_expression
 @define expression modules.tellraw_generator
 
 
@@ -25,6 +26,8 @@ image lmao3 = "./mcls/assets/rock3.jpg"
 
 tellrope menu = "./mcls/assets/nextbot_menu.html"
 
+var difficulty
+
 chat rock = ["<Скала> "]
 chat system = ["NEXTBOTMOD: "]
 
@@ -32,6 +35,7 @@ func pargen_activate() -> stands
     mod at @s
         execute data modify entity @s NoGravity set value 1b
         execute data modify entity @s Invisible set value 1b
+        execute data merge entity @s {CustomName:'{"text":"Страшный мужик"}'}
         execute tp ~10 ~10 ~10
         zero.set(0)
         self.pargen = True
@@ -47,14 +51,52 @@ input clear(num) -> @a
 input menu(num) -> @a
     menu.show(@s)
 
+input getDifficulty(num) -> @a
+    difficulty.store(difficulty)
+    system.log(@s, ["Значение сложности -> ", difficulty])
+
+
 rule pgen(pargen) -> stands
+    var prevBlockUnder
     mod at @s
         # Расчет угла поворота к игроку
+        foundPlayer = False
         mod facing entity @p[distance=..20] eyes
+            foundPlayer = True
             execute tp ^ ^ ^0.1
             axis0.setFromNbt(rot_axis0)
             axis1.setFromNbt(rot_axis1)
             execute tp ^ ^ ^-0.1
+
+        if foundPlayer == False
+            axis0.sub(1)
+            rot_axis0.storeFloat(axis0)
+            rot_axis1.storeFloat(zero)
+
+        canMove = False
+        mod if block ~ ~ ~ minecraft:air
+            canMove = True
+
+        isBlockUp = True
+        mod if block ~ ~1 ~ minecraft:air
+            isBlockUp = False
+
+        if canMove == False
+            execute tp ~ ~0.2 ~
+
+        isBlockUnder = True
+        mod if block ~ ~-1 ~ minecraft:air
+            isBlockUnder = False
+
+        if isBlockUnder == False
+            canMove = False
+            execute tp ^ ^-1 ^
+
+        if prevBlockUnder == isBlockUnder
+            pass
+        else
+            execute playsound minecraft:item.shovel.flatten player @p[distance=..20]
+            execute particle minecraft:explosion_emitter ~ ~ ~ 0 0 0 1 1 force @a
 
         # Логика поведения
         sprite = 2
@@ -63,17 +105,12 @@ rule pgen(pargen) -> stands
             health.setFromNbt(target_health, @p)
             mod if entity @p[distance=..2]
                 dealDamage = True
-            if health < 500
+            if health < 200
                 dealDamage = False
-            canMove = False
-            mod if block ~ ~ ~ minecraft:air
-                canMove = True
 
             if canMove
                 rot_axis0.storeFloat(axis0)
                 rot_axis1.storeFloat(axis1)
-                execute tp ^ ^ ^0.3
-            else
                 execute tp ^ ^ ^0.3
 
             player5blocks = 0
@@ -86,12 +123,14 @@ rule pgen(pargen) -> stands
                 sprite = 3
 
         if sprite == 1
-            lmao1.show(2, 2, 0.4, 0.07)
+            lmao1.show(2, 2, 0.5, 0.05)
         if sprite == 2
-            lmao2.show(2, 2, 0.4, 0.07)
+            lmao2.show(2, 2, 0.5, 0.04)
         if sprite == 3
-            lmao3.show(2, 2, 0.4, 0.07)
+            lmao3.show(2, 2, 0.5, 0.04)
 
         if dealDamage == True
             mod as @p
                 execute damage @s 3 minecraft:indirect_magic
+
+        prevBlockUnder = isBlockUnder
