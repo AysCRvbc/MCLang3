@@ -33,9 +33,13 @@ chat system = ["NEXTBOTMOD: "]
 
 func pargen_activate() -> stands
     mod at @s
+        difficulty.store(difficulty)
+        if difficulty == 0
+            rock.log(@a, ["Меня нельзя призвать при мирной сложности"])
+            execute kill @s
         execute data modify entity @s NoGravity set value 1b
         execute data modify entity @s Invisible set value 1b
-        execute data merge entity @s {CustomName:'{"text":"Страшный мужик"}'}
+        execute data merge entity @s {CustomName:'{"text":"Скалой Джонсоном"}'}
         execute tp ~10 ~10 ~10
         zero.set(0)
         self.pargen = True
@@ -57,6 +61,9 @@ input getDifficulty(num) -> @a
 
 
 rule pgen(pargen) -> stands
+    difficulty.store(difficulty)
+    if difficulty == 0
+        execute kill @s
     var prevBlockUnder
     mod at @s
         # Расчет угла поворота к игроку
@@ -131,6 +138,6 @@ rule pgen(pargen) -> stands
 
         if dealDamage == True
             mod as @p
-                execute damage @s 3 minecraft:indirect_magic
+                execute damage @s 3 minecraft:generic by @e[type=minecraft:armor_stand, sort=nearest, limit=1]
 
         prevBlockUnder = isBlockUnder
