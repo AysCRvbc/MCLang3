@@ -1,6 +1,7 @@
 @name test_midi
 
 @define expression modules.midi_generator
+@define block modules.mod_block
 
 chat system = ["System: "]
 midi midf = "./mcls/assets/test.mid"

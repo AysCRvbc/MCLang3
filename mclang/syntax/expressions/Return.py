@@ -10,10 +10,9 @@ class Parser(Prc.PrcParser):
         parser: pr.CodeParser = meta["PARSER"]
         ns: Namespace = nmeta.getNamespace()
 
-        if not block:
-            block = "None"
-        retval_line = f"retval = {block}"
-        res.append(retval_line)
+        if block:
+            retval_line = f"retval = {block}"
+            res.append(retval_line)
 
         process_name = ns.getFunction(nmeta.process)
 

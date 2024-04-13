@@ -102,10 +102,6 @@ class Parser(prc.PrcParser):
         ns.getValue(varname)["pointer"] = self
 
         self.midi = MidiParser(self.midi_path)
-        data_chords, timings = self.midi.parse_chords()
-        pairs = {}
-        for i in range(len(data_chords)):
-            pairs[timings[i] // 60] = data_chords[i]
 
         val_iP = f"{varname}_iP"
         val_Pos = f"{varname}_Pos"
@@ -117,14 +113,25 @@ class Parser(prc.PrcParser):
             f"{val_Pos} = 0",
             f"func {varname}_play() -> @a",
         ]
-        time = 0
-        for action in self.midi.parse_only_start():
+        midi = self.midi.parse_only_start()[:50]
+        time = midi[-1][2] // 60
+        code.extend([
+            f"    {val_Pos} = {val_Pos} + 1",
+            f"    if {val_Pos} > {time}",
+            f"        {val_iP} = 0",
+            f"        {val_Pos} = 0",
+            f"        return",
+        ]
+        )
+        for action in midi:
             note = action[0]
             velocity = round(1 + action[1] / 127, 3)
             time = action[2] // 60
             code.append(
-                f"    execute execute at @s if score @s {val_Pos_raw} matches {time} run "
-                f"execute run playsound custom:audnote_{note} ambient @s ~ ~ ~ {velocity}"
+                f"    mod at @s if score @s {val_Pos_raw} matches {time}"
+            )
+            code.append(
+                f"        execute execute run playsound custom:audnote_{note} ambient @s ~ ~ ~ {velocity}"
             )
 
             y = 0.75
@@ -134,17 +141,8 @@ class Parser(prc.PrcParser):
             if is_black(note):
                 color = (0, 0, 0)
             code.append(
-                f"    execute execute at @s if score @s {val_Pos_raw} matches {time} run "
-                f"execute run particle minecraft:dust {color[0]} {color[1]} {color[2]} 0.7 ~{x} ~{y} ~{z} 0 0 0.1 0 20 force @s"
+                f"        execute execute run particle minecraft:dust {color[0]} {color[1]} {color[2]} 0.7 ~{x} ~{y} ~{z} 0 0 0.1 0 20 force @s"
             )
-        code.extend([
-            f"    {val_Pos} = {val_Pos} + 1",
-            f"    if {val_Pos} > {time}",
-            f"        {val_iP} = 0",
-            f"        {val_Pos} = 0",
-            f"        return",
-        ]
-        )
 
         code.extend([
             f"observe {varname}_play -> @a",
