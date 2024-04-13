@@ -1,0 +1,20 @@
+@name test_midi
+
+@define expression modules.midi_generator
+
+chat system = ["System: "]
+midi midf = "./mcls/assets/test.mid"
+
+input start(num) -> @a
+    midf.start()
+
+input pause(num) -> @a
+    midf.pause()
+
+input stop(num) -> @a
+    midf.stop()
+
+input set_time(num) -> @a
+    midf.set_time(num)
+
+

@@ -3,7 +3,7 @@ import re
 BASIC_VARIABLES = {
     "True": {"type": "const", "value": 1},
     "False": {"type": "const", "value": 0},
-    "None": {"type": "const", "value": -1},
+    "None": {"type": "const", "value": 0},
     "@a": {"type": "selector", "value": "@a"},
     "@s": {"type": "selector", "value": "@s"},
     "@e": {"type": "selector", "value": "@e"},

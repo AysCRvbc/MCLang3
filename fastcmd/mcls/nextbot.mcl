@@ -18,7 +18,7 @@ float axis0
 float axis1
 float health
 
-selector stands = @e[type=armor_stand]
+
 
 image lmao1 = "./mcls/assets/rock.png"
 image lmao2 = "./mcls/assets/rock2.png"
@@ -31,6 +31,7 @@ var difficulty
 chat rock = ["<Скала> "]
 chat system = ["NEXTBOTMOD: "]
 
+selector stands = @e[type=armor_stand]
 func pargen_activate() -> stands
     mod at @s
         execute data modify entity @s NoGravity set value 1b

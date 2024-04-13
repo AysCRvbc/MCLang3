@@ -1,7 +1,7 @@
 import mclang.parser as pr
 import mclang.mcjson.parser as mcj
 
-filename = "./mcls/nextbot.mcl"
+filename = "./mcls/for_presentation.mcl"
 
 parser = pr.CodeParser()
 
