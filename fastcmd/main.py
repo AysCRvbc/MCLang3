@@ -6,7 +6,7 @@ filename = "./mcls/for_presentation.mcl"
 parser = pr.CodeParser()
 
 res = parser.get_prcs(filename)
-pos = "12 -55 14"
+pos = "44 10 101"
 center = [int(i) for i in pos.split()]
 res = mcj.getAllCommandBlocks(res, log=False, center=center)
 

@@ -18,7 +18,8 @@ float axis0
 float axis1
 float health
 
-
+selector stands = @e[type=armor_stand]
+selector rock_stands = @e[type=armor_stand, name=ROCK]
 
 image lmao1 = "./mcls/assets/rock.png"
 image lmao2 = "./mcls/assets/rock2.png"
@@ -31,38 +32,51 @@ var difficulty
 chat rock = ["<Скала> "]
 chat system = ["NEXTBOTMOD: "]
 
-selector stands = @e[type=armor_stand]
 func pargen_activate() -> stands
     mod at @s
+        difficulty.store(difficulty)
+        if difficulty == 0
+            rock.log(@a, ["Меня нельзя призвать при мирной сложности"])
+            execute kill @s
         execute data modify entity @s NoGravity set value 1b
         execute data modify entity @s Invisible set value 1b
-        execute data merge entity @s {CustomName:'{"text":"Страшный мужик"}'}
+        execute data merge entity @s {CustomName:'{"text":"ROCK"}'}
         execute tp ~10 ~10 ~10
         zero.set(0)
         self.pargen = True
+
 
 input activate(num) -> @a
     mod at @s
         spawn minecraft:armor_stand pargen_activate
 
+
 input clear(num) -> @a
-    mod as @e[type=armor_stand]
+    var number_of_stands
+    number_of_stands.store(execute if entity @e[type=armor_stand, name=ROCK])
+    system.log(@s, ["Количество скал -> ", number_of_stands])
+    mod as @e[type=armor_stand, name=ROCK]
         execute kill @s
+
 
 input menu(num) -> @a
     menu.show(@s)
+
 
 input getDifficulty(num) -> @a
     difficulty.store(difficulty)
     system.log(@s, ["Значение сложности -> ", difficulty])
 
 
-rule pgen(pargen) -> stands
+rule pgen(pargen) -> rock_stands
+    difficulty.store(difficulty)
+    if difficulty == 0
+        execute kill @s
     var prevBlockUnder
     mod at @s
         # Расчет угла поворота к игроку
         foundPlayer = False
-        mod facing entity @p[distance=..20] eyes
+        mod facing entity @p[distance=..20, gamemode=!creative, gamemode=!spectator] eyes
             foundPlayer = True
             execute tp ^ ^ ^0.1
             axis0.setFromNbt(rot_axis0)
@@ -79,14 +93,14 @@ rule pgen(pargen) -> stands
             canMove = True
 
         isBlockUp = True
-        mod if block ~ ~1 ~ minecraft:air
+        mod if block ~ ~0.5 ~ minecraft:air
             isBlockUp = False
 
         if canMove == False
             execute tp ~ ~0.2 ~
 
         isBlockUnder = True
-        mod if block ~ ~-1 ~ minecraft:air
+        mod if block ~ ~-0.5 ~ minecraft:air
             isBlockUnder = False
 
         if isBlockUnder == False
@@ -96,26 +110,28 @@ rule pgen(pargen) -> stands
         if prevBlockUnder == isBlockUnder
             pass
         else
-            execute playsound minecraft:item.shovel.flatten player @p[distance=..20]
+            execute playsound minecraft:item.shovel.flatten player @p[distance=..20, gamemode=!creative, gamemode=!spectator]
             execute particle minecraft:explosion_emitter ~ ~ ~ 0 0 0 1 1 force @a
 
         # Логика поведения
         sprite = 2
         dealDamage = False
-        mod if entity @p[distance=..20]
-            health.setFromNbt(target_health, @p)
-            mod if entity @p[distance=..2]
+        mod if entity @p[distance=..20, gamemode=!creative, gamemode=!spectator]
+            health.setFromNbt(target_health, @p[gamemode=!creative, gamemode=!spectator])
+            mod if entity @p[distance=..2, gamemode=!creative, gamemode=!spectator]
                 dealDamage = True
             if health < 200
                 dealDamage = False
 
-            if canMove
+            if canMove == True
                 rot_axis0.storeFloat(axis0)
                 rot_axis1.storeFloat(axis1)
                 execute tp ^ ^ ^0.3
+            else
+                execute tp ~ ~ ~0.2
 
             player5blocks = 0
-            mod if entity @p[distance=..5]
+            mod if entity @p[distance=..5, gamemode=!creative, gamemode=!spectator]
                 player5blocks = 1
 
             if player5blocks == 0
@@ -126,12 +142,12 @@ rule pgen(pargen) -> stands
         if sprite == 1
             lmao1.show(2, 2, 0.5, 0.05)
         if sprite == 2
-            lmao2.show(2, 2, 0.5, 0.04)
+            lmao2.show(2, 2, 0.5, 0.05)
         if sprite == 3
-            lmao3.show(2, 2, 0.5, 0.04)
+            lmao3.show(2, 2, 0.5, 0.05)
 
         if dealDamage == True
-            mod as @p
-                execute damage @s 3 minecraft:indirect_magic
+            mod as @p[gamemode=!creative, gamemode=!spectator]
+                execute damage @s 3 minecraft:generic by @e[type=minecraft:armor_stand, name=ROCK, sort=nearest, limit=1]
 
         prevBlockUnder = isBlockUnder
