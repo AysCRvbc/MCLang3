@@ -58,8 +58,26 @@ def getSelector(name: str, meta):
 
 
 class Parser(Prc.PrcParser):
+    def __init__(self):
+        self.name = None
+
     def parse(self, block, meta, base=None, data=None):
         getter, setter = [c.strip() for c in block.split("=", 1)]
+        self.name = getter
         ns: Namespace = meta["NMETA"].getNamespace()
         ns.setValue(getter, "selector")
         ns.variables[getter]["value"] = setter
+        ns.getValue(getter)["pointer"] = self
+
+    def get_value(self, ns):
+        return ns.getValue(self.name)['value']
+
+    def addTag(self, args, meta):
+        ns: Namespace = meta["NMETA"].getNamespace()
+        if len(args) > 1:
+            raise Exception("Too many arguments. Only one argument is allowed.")
+
+        data = ns.prefixy(args[0], is_global=True)
+        add = f"[tag={data}]"
+        new_selector = getSelector(self.name + add, meta)
+        ns.getValue(self.name)['value'] = new_selector

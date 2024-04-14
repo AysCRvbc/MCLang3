@@ -31,3 +31,13 @@ class Parser(prc.PrcParser):
                f"scoreboard players get @s {ns.getValue(args[0])['value']}")
 
         return {"type": "command", "value": cmd}
+
+    def storeInt(self, args, meta):
+        nmeta = meta["NMETA"]
+        ns: Namespace = meta["NMETA"].getNamespace()
+        parser: pr.CodeParser = meta["PARSER"]
+
+        cmd = (f"execute store result entity @s {ns.getValue(self.name)['nbt']} int 1 run "
+               f"scoreboard players get @s {ns.getValue(args[0])['value']}")
+
+        return {"type": "command", "value": cmd}

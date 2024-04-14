@@ -1,0 +1,96 @@
+@name intest
+
+@define block modules.mod_block
+@define expression modules.spawn_generator
+@define expression modules.nbt_expression
+@define expression modules.pass_expression
+@define expression modules.tp_expression
+@define block modules.rule_block
+@define block modules.repeat_block
+
+selector ints = @e[type=minecraft:interaction]
+ints.addTag(ownedInt)
+selector arrows = @e[type=minecraft:interaction]
+arrows.addTag(oarrow)
+
+chat rock = ["<INT> "]
+
+repeat i(1, 5)
+    var uuid_%i%
+    var interact_%i%
+    nbt nbt_uuid_%i% = attack.player[%i-1%]
+    nbt nbt_interact_%i% = interaction.player[%i-1%]
+
+var state
+var is_owner
+var interacting
+
+var arrow_live
+
+func arrow_init() -> @e[type=minecraft:interaction]
+    mod at @s rotated as @p
+        execute tp ^ ^ ^2
+        execute data modify entity @s Invisible set value 1b
+        execute data modify entity @s NoGravity set value 1b
+        arrow_live = 10
+    self.oarrow = True
+
+var fire_duration
+rule arrows(oarrow) -> arrows
+    mod at @s rotated as @p
+        execute tp ^ ^ ^1
+        arrow_live -= 1
+        execute particle minecraft:flame ~ ~ ~ 0.5 0.5 0.5 0 40 force
+
+        mod as @e[distance=..2]
+            self.onFire = True
+            fire_duration = 50
+
+    if arrow_live < 0
+        execute kill @s
+
+
+rule firing(onFire) -> @e
+    fire_duration -= 1
+    execute damage @s 1.5 minecraft:in_fire
+    if fire_duration < 0
+        self.onFire = False
+
+
+func init_int() -> @e[type=minecraft:interaction]
+    execute data merge entity @s {attack:{player:[0, 0, 0, 0], timestamp:1f}}
+    execute data modify entity @s attack.player set from entity @p UUID
+    execute data modify entity @s Invisible set value 1b
+    execute data modify entity @s height set value 2f
+    execute data modify entity @s width set value 2f
+
+    repeat i(1, 5)
+        uuid_%i%.store(data get entity @s attack.player[%i-1%])
+
+    self.ownedInt = True
+
+rule forInts(ownedInt) -> ints
+    is_owner = False
+    repeat i(1, 5)
+        nbt_uuid_%i%.storeInt(uuid_%i%)
+        interact_%i%.store(data get entity @s interaction.player[%i-1%])
+        if uuid_%i% == interact_%i%
+            is_owner = True
+
+    execute data remove entity @s interaction
+
+    interacting.store(data get entity @s interaction)
+    mod at @s
+        mod on attacker
+            tp ints[sort=nearest, limit=1], @s
+        if is_owner
+            spawn minecraft:interaction arrow_init
+
+
+
+input test(num) -> @a
+    mod at @s
+        spawn minecraft:interaction init_int
+input clear(num) -> @a
+    mod at @s
+        execute kill @e[type=minecraft:interaction]

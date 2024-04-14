@@ -15,6 +15,7 @@ class MidiParser:
         self.midi = mido.MidiFile(self.file_name)
         tempo = 400000
 
+
         for message in self.midi.merged_track:
             time_multiplier = tempo / 400000
             time = round(message.time * time_multiplier)
@@ -29,6 +30,8 @@ class MidiParser:
                 note = message.note
                 velocity = 0
                 self.actions_raw.append((note, velocity, time))
+            else:
+                self.actions_raw.append((None, 0, time))
 
         return self.actions_raw
 
@@ -82,6 +85,7 @@ def is_black(note):
 
 class Parser(prc.PrcParser):
     def __init__(self):
+        self.animated = None
         self.varname = None
         self.midi = None
         self.midi_path = None
@@ -95,7 +99,12 @@ class Parser(prc.PrcParser):
         parser: pr.CodeParser = meta["PARSER"]
 
         varname, path = [x.strip() for x in block.split("=")]
+        self.animated = False
         self.midi_path = eval(path)
+        if self.midi_path.endswith(":animated"):
+            self.midi_path = self.midi_path[:-9]
+            self.animated = True
+
         self.varname = varname
 
         ns.setValue(varname, "midi")
@@ -113,7 +122,7 @@ class Parser(prc.PrcParser):
             f"{val_Pos} = 0",
             f"func {varname}_play() -> @a",
         ]
-        midi = self.midi.parse_only_start()[:50]
+        midi = self.midi.parse_only_start()
         time = midi[-1][2] // 60
         code.extend([
             f"    {val_Pos} = {val_Pos} + 1",
@@ -134,15 +143,22 @@ class Parser(prc.PrcParser):
                 f"        execute execute run playsound custom:audnote_{note} ambient @s ~ ~ ~ {velocity}"
             )
 
-            y = 0.75
-            x = (10 * (1 - (note / 127)) - 5)
-            z = 1.5
-            color = (18000000, 18000000, 18000000)
-            if is_black(note):
-                color = (0, 0, 0)
-            code.append(
-                f"        execute execute run particle minecraft:dust {color[0]} {color[1]} {color[2]} 0.7 ~{x} ~{y} ~{z} 0 0 0.1 0 20 force @s"
-            )
+            if self.animated:
+                y = 1
+                diap = 4
+                x = diap * (0.5 - (note / 127))
+                z = 1.6
+                size = 0.4
+                color = (18000000, 18000000, 18000000)
+                if is_black(note):
+                    color = (0, 0, 0)
+                    code.append(
+                        f"        execute execute run particle minecraft:dust {color[0]} {color[1]} {color[2]} {size} ~{x} ~{y+0.05} ~{z-0.1} 0.005 0 0.07 0 200 force @s"
+                    )
+                else:
+                    code.append(
+                        f"        execute execute run particle minecraft:dust {color[0]} {color[1]} {color[2]} {size} ~{x} ~{y} ~{z-0.25} 0.01 0 0.1 0 200 force @s"
+                    )
 
         code.extend([
             f"observe {varname}_play -> @a",
@@ -167,7 +183,7 @@ class Parser(prc.PrcParser):
         ns: Namespace = meta["NMETA"].getNamespace()
         parser: pr.CodeParser = meta["PARSER"]
 
-        cmd = f"{self.varname}_iP = -1"
+        cmd = f"{self.varname}_iP = 0"
         return parser.parse_prcs(cmd)
 
     def stop(self, args, meta):
@@ -176,7 +192,7 @@ class Parser(prc.PrcParser):
         parser: pr.CodeParser = meta["PARSER"]
 
         cmd = (f"{self.varname}_iP = 0\n"
-               f"{self.varname}_Pos = -1\n")
+               f"{self.varname}_Pos = -20\n")
 
         return parser.parse_prcs(cmd)
 

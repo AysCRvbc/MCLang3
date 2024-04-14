@@ -59,7 +59,7 @@ def getAllCommandBlocks(prcs: list, center, log=False):
 
     trigger_cmds, delete_cmds = zip(*(block['cmds'] for block in triggers))
 
-    triggerBlocks = btr.getCommandsBlocks(trigger_cmds, *center, x_offset=trigger_x, chained=False, facing="north")
+    triggerBlocks = btr.getCommandsBlocks(trigger_cmds, *center, x_offset=trigger_x, chained=False, facing="north", conditional=False)
     deleteBlocks = btr.getCommandsBlocks(delete_cmds, *center, x_offset=trigger_x, chained=True, facing="north",
                                          z_offset=-1, deletes=True, btype="chain")
 

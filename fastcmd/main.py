@@ -1,12 +1,12 @@
 import mclang.parser as pr
 import mclang.mcjson.parser as mcj
 
-filename = "./mcls/for_presentation.mcl"
+filename = "./mcls/intest.mcl"
 
 parser = pr.CodeParser()
 
 res = parser.get_prcs(filename)
-pos = "25 -58 19"
+pos = "-22 -60 45"
 center = [int(i) for i in pos.split()]
 res = mcj.getAllCommandBlocks(res, log=False, center=center)
 
