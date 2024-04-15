@@ -1,0 +1,54 @@
+@name granata
+
+@define block modules.rule_block
+@define expression modules.nbt_expression
+@define expression modules.pass_expression
+
+selector arrows = @e[type=minecraft:arrow]
+selector inGroundArrows = @e[type=minecraft:arrow, nbt={inGround:1b}]
+chat arrow = ["<Стрела> "]
+
+var motion_y
+nbt motion_y_nbt = Motion[1]
+nbt inGround_nbt = inGround
+var inGround
+var lifetime
+var customDeath
+var init_happened
+
+rule arrowlife() -> arrows
+    if init_happened == True
+        pass
+    else
+        init_happened = True
+        lifetime = 100
+        customDeath = True
+    lifetime -= 1
+    if lifetime < 0
+        if customDeath == True
+            self.dead = True
+        else
+            execute kill @s
+
+var rot_1
+var rot_2
+nbt rot_1_nbt = Rotation[0]
+nbt rot_2_nbt = Rotation[1]
+
+rule explodeArrows() -> inGroundArrows
+    rot_1.store(data get entity @s Rotation[0] 100)
+    rot_2.store(data get entity @s Rotation[1] 100)
+    rot_1 = 180 - rot_1
+    rot_2 = 180 - rot_2
+    rot_1_nbt.storeDouble(rot_1, 0.01)
+    rot_2_nbt.storeDouble(rot_2, 0.01)
+    motion_y.store(data get entity @s Motion[1] 100)
+    inGround = 0
+    motion_y = -motion_y
+    motion_y_nbt.storeDouble(motion_y, 0.01)
+    inGround_nbt.storeInt(inGround)
+
+arrows.addTag(dead)
+
+rule grenade_death() -> arrows
+    execute kill @s

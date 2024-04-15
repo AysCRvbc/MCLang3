@@ -19,7 +19,6 @@ class Parser(Prc.PrcParser):
 
         self.name = block[0]
 
-
     def store(self, args, meta):
         ns: Namespace = meta["NMETA"].getNamespace()
 

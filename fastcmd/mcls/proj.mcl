@@ -1,0 +1,66 @@
+@name proj
+
+@define block modules.rule_block
+@define block modules.repeat_block
+@define block modules.mod_block
+@define expression modules.spawn_generator
+
+chat sys = ["[SYSTEM] -> "]
+
+selector ints = @e[type=minecraft:interaction]
+ints.addTag(ownedInt)
+
+repeat i(1, 5)
+    var uuid_%i%
+    var interact_%i%
+    var attack_%i%
+
+func init_int() -> @e[type=minecraft:interaction]
+    execute data merge entity @s {attack:{player:[0, 0, 0, 0], timestamp:1f}}
+    execute data modify entity @s attack.player set from entity @p UUID
+    execute data modify entity @s Invisible set value 1b
+    execute data modify entity @s height set value 2f
+    execute data modify entity @s width set value 2f
+    repeat i(1, 5)
+        uuid_%i%.store(data get entity @s attack.player[%i-1%])
+    self.ownedInt = True
+    execute data remove entity @s attack
+
+
+var owner_attack
+var owner_interact
+rule forInts(ownedInt) -> ints
+    # Проверка ЛКМ от владельца
+    owner_attack = 0
+    repeat i(1, 5)
+        attack_%i%.store(data get entity @s attack.player[%i-1%])
+        if uuid_%i% == attack_%i%
+            owner_attack += 1
+    if owner_attack == 4
+        owner_attack = True
+
+    # Проверка ЛКМ от владельца
+    owner_interact = 0
+    repeat i(1, 5)
+        interact_%i%.store(data get entity @s interaction.player[%i-1%])
+        if uuid_%i% == interact_%i%
+            owner_interact += 1
+    if owner_interact == 4
+        owner_interact = True
+
+    # чистка
+    execute data remove entity @s attack
+    execute data remove entity @s interaction
+
+    sys.log(@a, ["owner_attack = ", owner_attack])
+    sys.log(@a, ["owner_interact = ", owner_interact])
+    sys.log(@a, [" "])
+
+
+
+input test(num) -> @a
+    mod at @s
+        spawn minecraft:interaction init_int
+input clear(num) -> @a
+    mod at @s
+        execute kill @e[type=minecraft:interaction]

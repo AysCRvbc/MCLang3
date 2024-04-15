@@ -46,7 +46,7 @@ rule arrows(oarrow) -> arrows
         else
             execute tp ^ ^ ^0.5
         arrow_live -= 1
-        execute particle minecraft:flame ~ ~ ~ 1 1 1 0 5 force
+        execute particle minecraft:flame ~ ~ ~ 0.1 0.1 0.1 0 5 force
 
         mod as @e[distance=..2]
             execute damage @s 2 minecraft:in_fire
@@ -125,8 +125,10 @@ rule gasSpawner(gasSpawning) -> @e
         spawn minecraft:armor_stand gas_init
 
 nbt x_vel = Motion[0]
+nbt y_vel = Motion[1]
 nbt z_vel = Motion[2]
 var x_rnd
+var y_rnd
 var z_rnd
 var gas_level
 
@@ -134,20 +136,26 @@ rule gasBehavior(ogas) -> gases
     if gas_time < 0
         execute kill @s
     mod at @s
-        execute particle minecraft:squid_ink ~ ~ ~ 1 1 1 0 1
+        execute particle minecraft:squid_ink ~ ~ ~ 2 2 2 0 4
         mod as @e[distance=..2]
             gas_level += 1
-    x_rnd.store(random value -1..1)
-    z_rnd.store(random value -1..1)
-    x_vel.storeDouble(x_rnd)
-    z_vel.storeDouble(z_rnd)
+    x_rnd.store(random value -7..7)
+    y_rnd.store(random value -7..5)
+    z_rnd.store(random value -7..7)
+    x_vel.storeDouble(x_rnd, 0.1)
+    y_vel.storeDouble(y_rnd, 0.1)
+    z_vel.storeDouble(z_rnd, 0.1)
     gas_time -= 1
 
 rule commonRule() -> @e
     if gas_level <= 0
         gas_level = 0
+        return
     else
         gas_level -= 1
 
-    if gas_level >= 100
-        execute damage @s 1 minecraft:generic
+    if gas_level >= 1000
+        execute damage @s 2 minecraft:generic
+
+    if gas_level >= 1300
+        gas_level = 1300
