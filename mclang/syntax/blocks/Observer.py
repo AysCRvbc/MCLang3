@@ -19,6 +19,8 @@ class Parser(Prc.PrcParser):
 
         modifiers_types = {"select": [], "execute": []}
         for mod in modifiers:
+            if mod == "pass":
+                break
             arg = mod.split(" ", 1)[1]
             mod_base = mod.split(" ")[0]
 

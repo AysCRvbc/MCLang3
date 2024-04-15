@@ -14,6 +14,7 @@ class Parser(prc.PrcParser):
         parser: pr.CodeParser = meta["PARSER"]
         name, args = block.split("(", 1)
         args = sct.parse_arguments(args)
+        args = [arg for arg in args if arg if arg]
 
         selector = "@e"
         if len(block.split("->")) > 1:
@@ -30,5 +31,7 @@ class Parser(prc.PrcParser):
         code+= f"""observe {name} -> {selector}\n"""
         for arg in args:
             code += f"    select tag = {arg}"
+        if len(args) == 0:
+            code += f"    pass"
 
         prcs = parser.parse_code(code)

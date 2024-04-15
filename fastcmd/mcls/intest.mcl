@@ -12,6 +12,8 @@ selector ints = @e[type=minecraft:interaction]
 ints.addTag(ownedInt)
 selector arrows = @e[type=minecraft:interaction]
 arrows.addTag(oarrow)
+selector gases = @e[type=minecraft:armor_stand]
+gases.addTag(ogas)
 
 chat rock = ["<INT> "]
 
@@ -32,17 +34,22 @@ func arrow_init() -> @e[type=minecraft:interaction]
         execute tp ^ ^ ^2
         execute data modify entity @s Invisible set value 1b
         execute data modify entity @s NoGravity set value 1b
-        arrow_live = 10
+        arrow_live = 5
     self.oarrow = True
 
 var fire_duration
 rule arrows(oarrow) -> arrows
-    mod at @s rotated as @p
-        execute tp ^ ^ ^1
+    mod at @s
+        execute tp ~ ~0.3 ~
+        if arrow_live > 3
+            execute tp ^ ^ ^1
+        else
+            execute tp ^ ^ ^0.5
         arrow_live -= 1
-        execute particle minecraft:flame ~ ~ ~ 0.5 0.5 0.5 0 40 force
+        execute particle minecraft:flame ~ ~ ~ 1 1 1 0 5 force
 
         mod as @e[distance=..2]
+            execute damage @s 2 minecraft:in_fire
             self.onFire = True
             fire_duration = 50
 
@@ -52,7 +59,7 @@ rule arrows(oarrow) -> arrows
 
 rule firing(onFire) -> @e
     fire_duration -= 1
-    execute damage @s 1.5 minecraft:in_fire
+    execute damage @s 0.5 minecraft:in_fire
     if fire_duration < 0
         self.onFire = False
 
@@ -69,6 +76,8 @@ func init_int() -> @e[type=minecraft:interaction]
 
     self.ownedInt = True
 
+
+var interact_time = 0
 rule forInts(ownedInt) -> ints
     is_owner = False
     repeat i(1, 5)
@@ -84,9 +93,11 @@ rule forInts(ownedInt) -> ints
         mod on attacker
             tp ints[sort=nearest, limit=1], @s
         if is_owner
+            interact_time = 10
+
+        if interact_time > 0
+            interact_time -= 1
             spawn minecraft:interaction arrow_init
-
-
 
 input test(num) -> @a
     mod at @s
@@ -94,3 +105,49 @@ input test(num) -> @a
 input clear(num) -> @a
     mod at @s
         execute kill @e[type=minecraft:interaction]
+
+
+input start_gas(num) -> @a
+    self.gasSpawning = True
+input stop_gas(num) -> @a
+    self.gasSpawning = False
+
+var gas_time
+func gas_init() -> @e[type=minecraft:armor_stand]
+    self.ogas = True
+    execute data modify entity @s height set value 0.2f
+    execute data modify entity @s width set value 0.2f
+    execute data modify entity @s Invisible set value 1b
+    gas_time = 100
+
+rule gasSpawner(gasSpawning) -> @e
+    mod at @s
+        spawn minecraft:armor_stand gas_init
+
+nbt x_vel = Motion[0]
+nbt z_vel = Motion[2]
+var x_rnd
+var z_rnd
+var gas_level
+
+rule gasBehavior(ogas) -> gases
+    if gas_time < 0
+        execute kill @s
+    mod at @s
+        execute particle minecraft:squid_ink ~ ~ ~ 1 1 1 0 1
+        mod as @e[distance=..2]
+            gas_level += 1
+    x_rnd.store(random value -1..1)
+    z_rnd.store(random value -1..1)
+    x_vel.storeDouble(x_rnd)
+    z_vel.storeDouble(z_rnd)
+    gas_time -= 1
+
+rule commonRule() -> @e
+    if gas_level <= 0
+        gas_level = 0
+    else
+        gas_level -= 1
+
+    if gas_level >= 100
+        execute damage @s 1 minecraft:generic

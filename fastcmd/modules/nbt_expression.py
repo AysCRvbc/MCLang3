@@ -41,3 +41,19 @@ class Parser(prc.PrcParser):
                f"scoreboard players get @s {ns.getValue(args[0])['value']}")
 
         return {"type": "command", "value": cmd}
+
+    def storeDouble(self, args, meta):
+        nmeta = meta["NMETA"]
+        ns: Namespace = meta["NMETA"].getNamespace()
+        parser: pr.CodeParser = meta["PARSER"]
+        mult = 1
+        if len(args) == 0:
+            raise ValueError("need an argument")
+        if len(args) == 2:
+            mult = args[1]
+
+
+        cmd = (f"execute store result entity @s {ns.getValue(self.name)['nbt']} double {mult} run "
+               f"scoreboard players get @s {ns.getValue(args[0])['value']}")
+
+        return {"type": "command", "value": cmd}
