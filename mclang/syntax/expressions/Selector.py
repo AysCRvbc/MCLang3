@@ -66,7 +66,12 @@ class Parser(Prc.PrcParser):
         self.name = getter
         ns: Namespace = meta["NMETA"].getNamespace()
         ns.setValue(getter, "selector")
-        ns.variables[getter]["value"] = setter
+        base_selector = setter.split("[")[0]
+        data = ""
+        if "[" in setter:
+            data = "[" + setter.split("[", 1)[1]
+        base_selector += data
+        ns.variables[getter]["value"] = getSelector(base_selector, meta)
         ns.getValue(getter)["pointer"] = self
 
     def get_value(self, ns):

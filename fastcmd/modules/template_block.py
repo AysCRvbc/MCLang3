@@ -2,6 +2,7 @@ import mclang.syntax.PrcParser as prc
 from mclang import parser as pr
 from mclang.namespace import Namespace
 
+
 class Parser(prc.PrcParser):
     def __init__(self):
         self.name = None

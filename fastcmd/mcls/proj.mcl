@@ -3,59 +3,100 @@
 @define block modules.rule_block
 @define block modules.repeat_block
 @define block modules.mod_block
+@define expression modules.pass_expression
 @define expression modules.spawn_generator
+@define expression modules.nbt_expression
+@define expression modules.tp_expression
+@define block modules.store_block
+@define block modules.template_block
+
 
 chat sys = ["[SYSTEM] -> "]
-
 selector ints = @e[type=minecraft:interaction]
 ints.addTag(ownedInt)
-
 repeat i(1, 5)
     var uuid_%i%
-    var interact_%i%
+    var interaction_%i%
     var attack_%i%
+    nbt nbt_uuid_%i% = attack.player[%i-1%]
 
-func init_int() -> @e[type=minecraft:interaction]
-    execute data merge entity @s {attack:{player:[0, 0, 0, 0], timestamp:1f}}
+template clearInteraction
+    execute data merge entity @s {attack:{player:[0, 0, 0, 0], timestamp:1f}, interaction:{player:[0, 0, 0, 0], timestamp:1f}}
+
+template initInteration
+    clearInteraction.insert()
     execute data modify entity @s attack.player set from entity @p UUID
     execute data modify entity @s Invisible set value 1b
-    execute data modify entity @s height set value 2f
+    execute data modify entity @s height set value 4f
     execute data modify entity @s width set value 2f
     repeat i(1, 5)
         uuid_%i%.store(data get entity @s attack.player[%i-1%])
     self.ownedInt = True
-    execute data remove entity @s attack
 
 
 var owner_attack
-var owner_interact
+var owner_interaction
+var success_tp
+var itemId
+var lifetime
+
+func init_int() -> @e[type=minecraft:interaction]
+    initInteration.insert()
+
+selector arrows = @e[type=minecraft:arrow]
+selector inGroundArrows = @e[type=minecraft:arrow, nbt={inGround:1b}]
+
+selector grenades = arrows
+grenades.addTag(grenade)
+
+func grenade_init() -> arrows
+    self.grenade = True
+    lifetime = 100
+    customDeath = True
+
+rule grenadeBehavior(grenade) -> grenades
+    lifetime -= 1
+    if lifetime < 0
+        execute kill @s
+
+template attack_handlers
+    itemId.store(data get entity Cyrsia SelectedItem.tag.mod.id)
+    if itemId == 1
+        mod at @s
+            spawn minecraft:arrow grenade_init
+
+
+template interaction_handlers
+    pass
+
 rule forInts(ownedInt) -> ints
-    # Проверка ЛКМ от владельца
-    owner_attack = 0
+    # Обработка ПКМ и ЛКМ
+    repeat for data in ['attack', 'interaction']
+        owner_%data% = 0
+        repeat i(1, 5)
+            %data%_%i%.store(data get entity @s %data%.player[%i-1%])
+            if uuid_%i% == %data%_%i%
+                owner_%data% += 1
+        if owner_%data% == 4
+            owner_%data% = True
+
+    # Телепортация к владельцу
     repeat i(1, 5)
-        attack_%i%.store(data get entity @s attack.player[%i-1%])
-        if uuid_%i% == attack_%i%
-            owner_attack += 1
-    if owner_attack == 4
-        owner_attack = True
+        nbt_uuid_%i%.storeInt(uuid_%i%)
+    store success to success_tp
+        mod at @s on attacker
+            tp ints[sort=nearest, limit=1], @s
+    if success_tp == False
+        execute kill @s
 
-    # Проверка ЛКМ от владельца
-    owner_interact = 0
-    repeat i(1, 5)
-        interact_%i%.store(data get entity @s interaction.player[%i-1%])
-        if uuid_%i% == interact_%i%
-            owner_interact += 1
-    if owner_interact == 4
-        owner_interact = True
+    # Логика взаимодействия
+    repeat for type in ['attack', 'interaction']
+        if owner_%type%
+            mod at @s on attacker
+                %type%_handlers.insert()
 
-    # чистка
-    execute data remove entity @s attack
-    execute data remove entity @s interaction
-
-    sys.log(@a, ["owner_attack = ", owner_attack])
-    sys.log(@a, ["owner_interact = ", owner_interact])
-    sys.log(@a, [" "])
-
+    # Чистка значений
+    clearInteraction.insert()
 
 
 input test(num) -> @a
@@ -64,3 +105,6 @@ input test(num) -> @a
 input clear(num) -> @a
     mod at @s
         execute kill @e[type=minecraft:interaction]
+input give_me(num) -> @a
+    if num == 1
+        execute give @s stick{mod:{id:1}}

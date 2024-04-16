@@ -47,6 +47,9 @@ antiabs_code = f"""if %val% > 0
     %val% *= -1
 """
 
+sin_code = """
+"""
+
 def float_float(self, variables: list, meta):
     ns: Namespace = meta["NMETA"].getNamespace()
     variables[0] = ns.getValue(variables[0])["value"]

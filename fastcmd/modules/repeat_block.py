@@ -10,6 +10,9 @@ def split_injections(line):
     return re.split(regex, line)
 
 
+eval_namespace = {}
+
+
 class Parser(prc.PrcParser):
     def getName(self):
         return "repeat"
@@ -19,6 +22,42 @@ class Parser(prc.PrcParser):
         ns: Namespace = meta["NMETA"].getNamespace()
         parser: pr.CodeParser = meta["PARSER"]
 
+        prcs = []
+        if block.split(" ", 1)[0] == "for":
+            prcs = self.parse_for(block, data, parser)
+        else:
+            prcs = self.parse_range(block, data, parser)
+
+        return prcs
+
+    def parse_for(self, block, data, parser):
+        ev_ns = eval_namespace
+        code = ""
+        splitted = split_injections(data)
+        block_var = block.split(" ")[1]
+        code_eval = f"{block}:"
+        code_eval_inner = f"""\nline = \"\"
+for e in splitted:
+    if e[0] == \"%\" and e[-1] == \"%\":
+        ev_ns[\"{block_var}\"] = {block_var}
+        try:
+            e = eval(e[1:-1], ev_ns.copy())
+        except:
+            pass
+    line += str(e)
+code += line
+"""
+        code_eval_inner = "\n    ".join(code_eval_inner.splitlines())
+        code_eval += code_eval_inner
+        lmao = locals().copy()
+        exec(code_eval, lmao)
+        code = lmao["code"]
+
+        prcs = parser.parse_prcs(code)
+        eval_namespace.pop(block_var)
+        return prcs
+
+    def parse_range(self, block, data, parser):
         block_name, args = block.split("(", 1)
         args = sct.parse_arguments(args)
         try:
@@ -33,8 +72,11 @@ class Parser(prc.PrcParser):
             line = ""
             for e in splitted:
                 if e[0] == "%" and e[-1] == "%":
-                    e = eval(e[1:-1], {"i": i})
+                    eval_namespace[block_name] = i
+                    e = eval(e[1:-1], eval_namespace.copy())
                 line += str(e)
             code += line
 
-        return parser.parse_prcs(code)
+        prcs = parser.parse_prcs(code)
+        eval_namespace.pop(block_name)
+        return prcs
