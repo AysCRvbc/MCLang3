@@ -45,10 +45,10 @@ func init_int() -> @e[type=minecraft:interaction]
     initInteration.insert()
 
 selector arrows = @e[type=minecraft:arrow]
-selector inGroundArrows = arrows[nbt={inGround:1b}]
-
 selector grenades = arrows
 grenades.addTag(grenade)
+
+selector inGroundArrows = grenades[nbt={inGround:1b}]
 
 
 float rot
@@ -88,7 +88,7 @@ rule grenadeBehavior(grenade) -> grenades
     mod at @s
         lifetime -= 1
         if lifetime < 0
-            execute summon minecraft:tnt
+#            execute summon minecraft:tnt
             execute kill @s
 
 
