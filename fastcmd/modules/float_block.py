@@ -5,13 +5,12 @@ import mclang.syntax.expressions.lang.VariableSet as vs
 import mclang.namespace as nss
 from mclang.namespace import Namespace
 
-
-atan_code = f"""float sign
-float res
-float temp_atan
-sign.set(1)
+atan_code = f"""float sign_atan_func
+float res_atan_func
+float temp_atan_func
+sign_atan_func.set(1)
 if %val% > 0
-    sign.set(-1)
+    sign_atan_func.set(-1)
 %val%.antiabs()
 
 if %val% < -362
@@ -19,36 +18,98 @@ if %val% < -362
 else
     %val%.add(2)
     
-    res.set(-1.1)
-    temp_atan.set(%val%)
-    temp_atan.mul(0.2)
-    res.add(temp_atan)
+    res_atan_func.set(-1.1)
+    temp_atan_func.set(%val%)
+    temp_atan_func.mul(0.2)
+    res_atan_func.add(temp_atan_func)
     
-    temp_atan.set(%val%)
-    temp_atan.pow(2)
-    temp_atan.mul(0.08)
-    res.add(temp_atan)
+    temp_atan_func.set(%val%)
+    temp_atan_func.pow(2)
+    temp_atan_func.mul(0.08)
+    res_atan_func.add(temp_atan_func)
     
-    temp_atan.set(%val%)
-    temp_atan.pow(3)
-    temp_atan.mul(0.03)
-    res.add(temp_atan)
+    temp_atan_func.set(%val%)
+    temp_atan_func.pow(3)
+    temp_atan_func.mul(0.03)
+    res_atan_func.add(temp_atan_func)
     
-    temp_atan.set(%val%)
-    temp_atan.pow(4)
-    temp_atan.mul(0.01)
-    res.add(temp_atan)
+    temp_atan_func.set(%val%)
+    temp_atan_func.pow(4)
+    temp_atan_func.mul(0.01)
+    res_atan_func.add(temp_atan_func)
     
-    res.mul(sign)
-    %val%.set(res)
+    res_atan_func.mul(sign_atan_func)
+    %val%.set(res_atan_func)
 """
 
 antiabs_code = f"""if %val% > 0
     %val% *= -1
 """
 
-sin_code = """
+round_code = f"""float res_round_func
+res_round_func.set(%val%)
+res_round_func %= 100
+if res_round_func >= 50
+    %val% /= 100
+    %val% += 1
+    %val% *= 100
+else
+    %val% /= 100
+    %val% *= 100
 """
+
+pi2_cycle_approx_code = f"""
+float temp_pi2_cycle_approx
+float temp_pi2_cycle_approx_pi2
+float temp2_pi2_cycle_approx
+temp_pi2_cycle_approx.set(%val%)
+temp_pi2_cycle_approx_pi2.set(6.28)
+temp_pi2_cycle_approx.frac(temp_pi2_cycle_approx_pi2)
+temp_pi2_cycle_approx.round()
+temp_pi2_cycle_approx.mul(temp_pi2_cycle_approx_pi2)
+temp2_pi2_cycle_approx.set(%val%)
+temp2_pi2_cycle_approx.sub(temp_pi2_cycle_approx)
+%val% = temp2_pi2_cycle_approx
+"""
+
+sin_code = f"""
+%val%.pi2_cycle_approx()
+float temp_sin_func_res
+float temp_sin_func_temp
+float temp_sin_func_temp1
+float temp_sin_func_temp2
+float temp_sin_func_temp3
+
+temp_sin_func_temp1.set(%val%)
+temp_sin_func_temp2.set(%val%)
+temp_sin_func_temp3.set(%val%)
+
+temp_sin_func_temp1.frac(12)
+temp_sin_func_temp2.pow(3)
+temp_sin_func_temp2.frac(569)
+temp_sin_func_temp1.sub(temp_sin_func_temp2)
+temp_sin_func_temp3.pow(2)
+temp_sin_func_temp3.frac(10)
+temp_sin_func_temp3.mul(temp_sin_func_temp1)
+
+temp_sin_func_temp1.set(%val%)
+temp_sin_func_temp2.set(temp_sin_func_temp3)
+temp_sin_func_temp3.set(%val%)
+
+temp_sin_func_temp1.frac(6)
+temp_sin_func_temp1.sub(temp_sin_func_temp2)
+temp_sin_func_temp3.mul(temp_sin_func_temp1)
+
+temp_sin_func_temp1.set(1)
+temp_sin_func_temp2.set(temp_sin_func_temp3)
+temp_sin_func_temp3.set(%val%)
+
+temp_sin_func_temp1.sub(temp_sin_func_temp2)
+temp_sin_func_temp3.mul(temp_sin_func_temp1)
+
+%val% = temp_sin_func_temp3
+"""
+
 
 def float_float(self, variables: list, meta):
     ns: Namespace = meta["NMETA"].getNamespace()
@@ -56,6 +117,7 @@ def float_float(self, variables: list, meta):
     variables[1] = ns.getValue(variables[1])["value"]
     res = [{"type": "command", "value": f"scoreboard players operation @s {variables[0]} = @s {variables[1]}"}]
     return res
+
 
 def float_const(self, variables: list, meta):
     ns: Namespace = meta["NMETA"].getNamespace()
@@ -65,6 +127,7 @@ def float_const(self, variables: list, meta):
         setter = ns.getValue(setter)["value"]
     return [{"type": "command", "value": f"scoreboard players set @s {variables[0]} {setter}"}]
 
+
 def sc_float(self, variables: list, meta):
     ns: Namespace = meta["NMETA"].getNamespace()
     variables[0] = ns.getValue(variables[0])["value"]
@@ -72,12 +135,14 @@ def sc_float(self, variables: list, meta):
     res = [{"type": "command", "value": f"scoreboard players operation @s {variables[0]} = @s {variables[1]}"}]
     return res
 
+
 def float_sc(self, variables: list, meta):
     ns: Namespace = meta["NMETA"].getNamespace()
     variables[0] = ns.getValue(variables[0])["value"]
     variables[1] = ns.getValue(variables[1])["value"]
     res = [{"type": "command", "value": f"scoreboard players operation @s {variables[0]} = @s {variables[1]}"}]
     return res
+
 
 class Parser(prc.PrcParser):
     def __init__(self):
@@ -93,6 +158,7 @@ class Parser(prc.PrcParser):
 
     def getName(self):
         return "float"
+
     def parse(self, block, meta, base=None, data=None):
         nmeta = meta["NMETA"]
         ns: Namespace = meta["NMETA"].getNamespace()
@@ -102,7 +168,6 @@ class Parser(prc.PrcParser):
         ns.getValue(block)['pointer'] = self
         self.name = block
         nss.scoreboard_variables.append(ns.getValue(block))
-
 
     def setFromNbt(self, args, meta):
         nmeta = meta["NMETA"]
@@ -126,7 +191,7 @@ class Parser(prc.PrcParser):
 
         val = args[0]
         try:
-            val = int(float(val)*100)
+            val = int(float(val) * 100)
         except:
             if ns.getValue(val)['type'] != "float":
                 raise Exception("float expected")
@@ -141,7 +206,7 @@ class Parser(prc.PrcParser):
 
         val = args[0]
         try:
-            val = int(round(float(val)*100))
+            val = int(round(float(val) * 100))
 
         except:
             if ns.getValue(val)['type'] != "float":
@@ -156,7 +221,7 @@ class Parser(prc.PrcParser):
 
         val = args[0]
         try:
-            val = int(float(val)*100)
+            val = int(float(val) * 100)
         except:
             if ns.getValue(val)['type'] != "float":
                 raise Exception("float expected")
@@ -186,13 +251,37 @@ class Parser(prc.PrcParser):
         prcs = parser.parse_prcs(code)
         return prcs
 
+    def round(self, args, meta):
+        ns: Namespace = meta["NMETA"].getNamespace()
+        parser: pr.CodeParser = meta["PARSER"]
+
+        code = round_code.replace("%val%", self.name)
+        prcs = parser.parse_prcs(code)
+        return prcs
+
+    def pi2_cycle_approx(self, args, meta):
+        ns: Namespace = meta["NMETA"].getNamespace()
+        parser: pr.CodeParser = meta["PARSER"]
+
+        code = pi2_cycle_approx_code.replace("%val%", self.name)
+        prcs = parser.parse_prcs(code)
+        return prcs
+
+    def sin(self, args, meta):
+        ns: Namespace = meta["NMETA"].getNamespace()
+        parser: pr.CodeParser = meta["PARSER"]
+
+        code = sin_code.replace("%val%", self.name)
+        prcs = parser.parse_prcs(code)
+        return prcs
+
     def mul(self, args, meta):
         ns: Namespace = meta["NMETA"].getNamespace()
         parser: pr.CodeParser = meta["PARSER"]
 
         val = args[0]
         try:
-            val = int(float(val)*100)
+            val = int(float(val) * 100)
         except:
             if ns.getValue(val)['type'] != "float":
                 raise Exception("float expected")
@@ -208,7 +297,7 @@ class Parser(prc.PrcParser):
 
         val = args[0]
         try:
-            val = int(float(val)*100)
+            val = int(float(val) * 100)
         except:
             if ns.getValue(val)['type'] != "float":
                 raise Exception("float expected")
@@ -222,14 +311,14 @@ class Parser(prc.PrcParser):
 
         val = args[0]
         try:
-            val = int(float(val)*100)
+            val = int(float(val) * 100)
         except:
             if ns.getValue(val)['type'] != "float":
                 raise Exception("float expected")
 
-        frac_val = val//100
+        frac_val = val // 100 - 1
 
-        frac_val = 100**frac_val
+        frac_val = 100 ** frac_val
 
         setter = f"{self.name}"
         while val > 100:

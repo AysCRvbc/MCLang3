@@ -9,6 +9,7 @@
 @define expression modules.tp_expression
 @define block modules.store_block
 @define block modules.template_block
+@define block modules.float_block
 
 
 chat sys = ["[SYSTEM] -> "]
@@ -108,3 +109,9 @@ input clear(num) -> @a
 input give_me(num) -> @a
     if num == 1
         execute give @s stick{mod:{id:1}}
+
+float temp_float
+input round_test(num) -> @a
+    temp_float = num
+    temp_float.sin()
+    sys.log(@a, [temp_float])
