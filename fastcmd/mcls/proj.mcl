@@ -45,23 +45,75 @@ func init_int() -> @e[type=minecraft:interaction]
     initInteration.insert()
 
 selector arrows = @e[type=minecraft:arrow]
-selector inGroundArrows = @e[type=minecraft:arrow, nbt={inGround:1b}]
+selector inGroundArrows = arrows[nbt={inGround:1b}]
 
 selector grenades = arrows
 grenades.addTag(grenade)
 
+
+float rot
+float motion_X
+float motion_Z
+float speed
+
+repeat i(1,4)
+    nbt motion_%i% = Motion[%i-1%]
+
+template updateMotion
+    rot.setFromNbt(Rotation[0])
+    rot.mul(3.14)
+    rot.frac(180)
+    motion_X.set(rot)
+    motion_X.sin()
+    motion_X = -motion_X
+    motion_X.mul(speed)
+    motion_Z.set(rot)
+    motion_Z.cos()
+    motion_Z.mul(speed)
+    motion_1.storeDouble(motion_X, 0.01)
+    motion_3.storeDouble(motion_Z, 0.01)
+
 func grenade_init() -> arrows
     self.grenade = True
+    speed.set(1.5)
     lifetime = 100
-    customDeath = True
+    execute data modify entity @s Silent set value 1b
+
+    execute tp @p
+    updateMotion.insert()
+    mod at @s
+        execute tp ~ ~1.5 ~
 
 rule grenadeBehavior(grenade) -> grenades
-    lifetime -= 1
-    if lifetime < 0
-        execute kill @s
+    mod at @s
+        lifetime -= 1
+        if lifetime < 0
+            execute summon minecraft:tnt
+            execute kill @s
+
+
+var motion_y
+nbt motion_y_nbt = Motion[1]
+nbt inGround_nbt = inGround
+var rot_1
+var rot_2
+nbt rot_1_nbt = Rotation[0]
+nbt rot_2_nbt = Rotation[1]
+rule explodeArrows() -> inGroundArrows
+    rot_1.store(data get entity @s Rotation[0] 100)
+    rot_2.store(data get entity @s Rotation[1] 100)
+    rot_1 = 180 - rot_1
+    rot_2 = 180 - rot_2
+    rot_1_nbt.storeDouble(rot_1, 0.01)
+    rot_2_nbt.storeDouble(rot_2, 0.01)
+    motion_y.store(data get entity @s Motion[1] 100)
+    inGround = 0
+    motion_y = -motion_y
+    motion_y_nbt.storeDouble(motion_y, 0.01)
+    inGround_nbt.storeInt(inGround)
 
 template attack_handlers
-    itemId.store(data get entity Cyrsia SelectedItem.tag.mod.id)
+    itemId.store(data get entity @s SelectedItem.tag.mod.id)
     if itemId == 1
         mod at @s
             spawn minecraft:arrow grenade_init
@@ -109,9 +161,3 @@ input clear(num) -> @a
 input give_me(num) -> @a
     if num == 1
         execute give @s stick{mod:{id:1}}
-
-float temp_float
-input round_test(num) -> @a
-    temp_float = num
-    temp_float.sin()
-    sys.log(@a, [temp_float])

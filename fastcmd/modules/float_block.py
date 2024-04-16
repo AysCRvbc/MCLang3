@@ -79,11 +79,9 @@ float temp_sin_func_temp
 float temp_sin_func_temp1
 float temp_sin_func_temp2
 float temp_sin_func_temp3
-
 temp_sin_func_temp1.set(%val%)
 temp_sin_func_temp2.set(%val%)
 temp_sin_func_temp3.set(%val%)
-
 temp_sin_func_temp1.frac(12)
 temp_sin_func_temp2.pow(3)
 temp_sin_func_temp2.frac(569)
@@ -91,25 +89,24 @@ temp_sin_func_temp1.sub(temp_sin_func_temp2)
 temp_sin_func_temp3.pow(2)
 temp_sin_func_temp3.frac(10)
 temp_sin_func_temp3.mul(temp_sin_func_temp1)
-
 temp_sin_func_temp1.set(%val%)
 temp_sin_func_temp2.set(temp_sin_func_temp3)
 temp_sin_func_temp3.set(%val%)
-
 temp_sin_func_temp1.frac(6)
 temp_sin_func_temp1.sub(temp_sin_func_temp2)
 temp_sin_func_temp3.mul(temp_sin_func_temp1)
-
 temp_sin_func_temp1.set(1)
 temp_sin_func_temp2.set(temp_sin_func_temp3)
 temp_sin_func_temp3.set(%val%)
-
 temp_sin_func_temp1.sub(temp_sin_func_temp2)
 temp_sin_func_temp3.mul(temp_sin_func_temp1)
-
 %val% = temp_sin_func_temp3
 """
 
+cos_code = f"""
+%val%.add(1.57)
+%val%.sin()
+"""
 
 def float_float(self, variables: list, meta):
     ns: Namespace = meta["NMETA"].getNamespace()
@@ -272,6 +269,14 @@ class Parser(prc.PrcParser):
         parser: pr.CodeParser = meta["PARSER"]
 
         code = sin_code.replace("%val%", self.name)
+        prcs = parser.parse_prcs(code)
+        return prcs
+
+    def cos(self, args, meta):
+        ns: Namespace = meta["NMETA"].getNamespace()
+        parser: pr.CodeParser = meta["PARSER"]
+
+        code = cos_code.replace("%val%", self.name)
         prcs = parser.parse_prcs(code)
         return prcs
 
