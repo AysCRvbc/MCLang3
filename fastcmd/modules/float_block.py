@@ -58,6 +58,10 @@ else
     %val% *= 100
 """
 
+relu_code = f"""if %val% < 0
+    %val%.set(0)
+"""
+
 pi2_cycle_approx_code = f"""
 float temp_pi2_cycle_approx
 float temp_pi2_cycle_approx_pi2
@@ -335,4 +339,15 @@ class Parser(prc.PrcParser):
         prcs.extend(
             parser.parse_prcs(f"{self.name} /= {frac_val}"))
 
+        return prcs
+
+    def linear(self, args, meta):
+        pass
+
+    def relu(self, args, meta):
+        ns: Namespace = meta["NMETA"].getNamespace()
+        parser: pr.CodeParser = meta["PARSER"]
+
+        code = relu_code.replace("%val%", self.name)
+        prcs = parser.parse_prcs(code)
         return prcs

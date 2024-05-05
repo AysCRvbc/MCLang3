@@ -1,7 +1,7 @@
 import mclang.parser as pr
 import mclang.mcjson.parser as mcj
 
-filename = "./mcls/proj.mcl"
+filename = "./mcls/lineai.mcl"
 
 parser = pr.CodeParser()
 

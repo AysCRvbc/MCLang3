@@ -36,7 +36,7 @@ def getAllCommandBlocks(prcs: list, center, log=False):
         btype = block['type']
 
         if btype == "function":
-            fblocks = btr.getCommandsBlocks(block['cmds'], *center, x_offset=x_offset, conditional=False, max_y=80)
+            fblocks = btr.getCommandsBlocks(block['cmds'], *center, x_offset=x_offset, conditional=False, max_y=200)
             res.extend(fblocks)
         elif btype == "command":
             if single_commands_x == -1:
@@ -54,8 +54,8 @@ def getAllCommandBlocks(prcs: list, center, log=False):
 
         x_offset += 1
 
-    single_cmds_blocks = btr.getCommandsBlocks(single_commands, *center, x_offset=single_commands_x, chained=False,
-                                               btype=None)
+    single_cmds_blocks = btr.getCommandsBlocks(single_commands, *center, x_offset=single_commands_x, chained=True,
+                                               btype=None, conditional=False, max_y=200)
 
     trigger_cmds, delete_cmds = zip(*(block['cmds'] for block in triggers))
 

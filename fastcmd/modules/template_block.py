@@ -6,6 +6,7 @@ from mclang.namespace import Namespace
 class Parser(prc.PrcParser):
     def __init__(self):
         self.name = None
+        self.code = ""
 
     def getName(self):
         return "template"
@@ -16,13 +17,12 @@ class Parser(prc.PrcParser):
 
         ns.setValue(block, "code_template")
         ns.getValue(block)['pointer'] = self
-        ns.getValue(block)['value'] = data
+        self.code = data
         self.name = block
 
     def insert(self, args, meta):
         nmeta = meta["NMETA"]
-        ns: Namespace = nmeta.getNamespace()
         parser: pr.CodeParser = meta["PARSER"]
-        prc_list = parser.parse_prcs(ns.getValue(self.name)['value'])
+        prc_list = parser.parse_prcs(self.code)
 
         return prc_list
