@@ -112,6 +112,7 @@ cos_code = f"""
 %val%.sin()
 """
 
+
 def float_float(self, variables: list, meta):
     ns: Namespace = meta["NMETA"].getNamespace()
     variables[0] = ns.getValue(variables[0])["value"]
@@ -294,6 +295,22 @@ class Parser(prc.PrcParser):
         except:
             if ns.getValue(val)['type'] != "float":
                 raise Exception("float expected")
+
+        code = (f"{self.name} *= {val}\n"
+                f"{self.name} /= 100")
+
+        return parser.parse_prcs(code)
+
+    def multiplied(self, args, meta):
+        ns: Namespace = meta["NMETA"].getNamespace()
+        parser: pr.CodeParser = meta["PARSER"]
+
+        setter = args[0]
+        val = args[1]
+        try:
+            val = int(float(val))
+        except:
+            raise Exception("float expected in second argument")
 
         code = (f"{self.name} *= {val}\n"
                 f"{self.name} /= 100")

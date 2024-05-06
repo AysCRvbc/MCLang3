@@ -5,6 +5,7 @@
 @define block modules.float_block
 @define block modules.store_block
 @define block modules.mod_block
+@define expression modules.storage_expression
 
 chat system = ["[SYSTEM] -> "]
 var check
@@ -12,19 +13,19 @@ var counter
 
 input activate(x) -> @a
     mod at @s
-        repeat i(0, 36)
+        repeat i(0, 100)
             float array_%i%
             array_%i%.set(0)
             check = 0
-            check.store(execute if block %(i // 6) - 12% %(i.__mod__(6) - 60)% 9 minecraft:black_wool)
-            if check == 1
+            check.store(execute if block %(i // 10) - 12% %(i.__mod__(10) - 45)% 9 minecraft:white_wool)
+            if check == 0
                 array_%i%.set(1)
                 system.log(@s, ["Найден блок на позиции %(i // 6) - 12% %(i.__mod__(6) - 60)% 9"])
 
         lineai_tplt.predict.insert()
-        repeat i(0, 36)
-            if array_%i% > 40
-                execute setblock %(i // 6) - 12% %(i.__mod__(6) - 60)% 9 minecraft:black_wool destroy
+        repeat i(0, 100)
+            if array_%i% > 30
+                execute setblock %(i // 10) - 12% %(i.__mod__(10) - 45)% 9 minecraft:black_wool destroy
             else
-                execute setblock %(i // 6) - 12% %(i.__mod__(6) - 60)% 9 minecraft:white_wool destroy
+                execute setblock %(i // 10) - 12% %(i.__mod__(10) - 45)% 9 minecraft:white_wool destroy
 
